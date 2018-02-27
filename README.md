@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krook/refarch-template.svg?branch=master)](https://travis-ci.org/krook/refarch-template)
+[![Build Status](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template.svg?branch=master)](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template)
 
 # Reference architecture with IBM Cloud Functions (powered by Apache OpenWhisk)
 
@@ -20,7 +20,7 @@ You should have a basic understanding of the Apache OpenWhisk programming model.
 
 Also, you'll need an IBM Cloud account and the latest [OpenWhisk command line tool (`wsk`) installed and on your PATH](https://github.com/IBM/openwhisk-action-trigger-rule/blob/master/docs/OPENWHISK.md).
 
-As an alternative to this end-to-end example, you might also consider the more [basic "building block" version](https://github.com/krook/refarch-template) of this sample.
+As an alternative to this end-to-end example, you might also consider the more [basic "building block" version](https://github.com/IBM/ibm-cloud-functions-refarch-template) of this sample.
 
 ## Steps
 
@@ -91,7 +91,7 @@ wsk property get --cliversion
 
 You can also use the following button to clone a copy of this repository and deploy to the IBM Cloud as part of a DevOps toolchain. Supply your OpenWhisk and MySQL credentials under the Delivery Pipeline icon, click Create, then run the Deploy stage for the Delivery Pipeline.
 
-[![Deploy to the IBM Cloud](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/krook/refarch-template.git)
+[![Deploy to the IBM Cloud](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/IBM/ibm-cloud-functions-refarch-template.git)
 
 # License
 
