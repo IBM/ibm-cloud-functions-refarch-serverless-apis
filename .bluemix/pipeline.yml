@@ -9,11 +9,11 @@ stages:
   triggers:
   - type: commit
   properties:
-  - name: OPENWHISK_API_ENDPOINT
-    value: ${OPENWHISK_API_ENDPOINT}
+  - name: CLOUD_FUNCTIONS_API_ENDPOINT
+    value: ${CLOUD_FUNCTIONS_API_ENDPOINT}
     type: text
-  - name: OPENWHISK_AUTH_KEY
-    value: ${OPENWHISK_AUTH_KEY}
+  - name: CLOUD_FUNCTIONS_API_KEY
+    value: ${CLOUD_FUNCTIONS_API_KEY}
     type: secure
   - name: MESSAGE_HUB_API_KEY
     value: ${MESSAGE_HUB_API_KEY}
@@ -60,7 +60,7 @@ stages:
       fi
 
       # set up openwhisk cli
-      ./wsk property set --apihost ${OPENWHISK_API_ENDPOINT} --auth ${OPENWHISK_AUTH_KEY}
+      ./wsk property set --apihost ${CLOUD_FUNCTIONS_API_ENDPOINT} --auth ${CLOUD_FUNCTIONS_API_KEY}
 
       # create openwhisk package
       ./wsk package refresh

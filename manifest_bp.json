@@ -1,0 +1,16 @@
+{
+    "name": "New Template Item",
+    "description": "This reference architecture deploys a new ... .",
+    "long_description": "This template will create an action and a trigger that will kick off that action. The trigger is fired whenever there is a new item added to the ... instance and queue chosen when you create this template.",
+    "url": "https://github.com/zachschultz/owbp-message-hub-trigger",
+    "runtime": {
+      "name": "Node.js 6",
+      "kind": "nodejs:6",
+      "type": "nodejs"
+    },
+    "categories": [
+      "nodejs",
+      "template",
+      "refarch"
+    ]
+  }

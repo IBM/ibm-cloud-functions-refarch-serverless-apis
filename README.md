@@ -1,98 +1,73 @@
-[![Build Status](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template.svg?branch=master)](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template)
-
 # Reference architecture with IBM Cloud Functions (powered by Apache OpenWhisk)
 
-This project shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from .... No resources are consumed until ... When they are called, resources are provisioned to exactly match the current load needed by each ...
+[![Build Status](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template.svg?branch=master)](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template)
 
-Lorem ipsum.
+This project shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from [...]. No resources are consumed until [...] When they are called, resources are provisioned to exactly match the current load needed by each [...]. In addition to using cloud resources efficiently, this means that developers can build and deploy applications more quickly.
 
-![Sample Architecture](docs/cloud-functions.png)
+This reference architecture template provides a skeleton for IBM Cloud Functions reference architectures. You can deploy it right away using the [IBM Cloud Functions user interface](#deploy-through-the-ibm-cloud-functions-console-user-interface), or setup and deploy using [command line tools on your own system](#deploy-using-the-wskdeploy-command-line-tool).
+
+If you haven't already, sign up for an IBM Cloud account and go to the [Cloud Functions dashboard](https://console.bluemix.net/openwhisk/) to explore reference architecture templates and download command line tools, if needed.
 
 ## Included components
 
 - IBM Cloud Functions (powered by Apache OpenWhisk)
-- Component A (Open source project)
-- Component B (Open source project)
+- Service A (Powered by open source project A)
+- Service B (Powered by open source project B)
 
-## Prerequisite
+![Sample Architecture](img/refarch-placeholder.png)
 
-You should have a basic understanding of the Apache OpenWhisk programming model. If not, [try the action, trigger, and rule demo first](https://github.com/IBM/openwhisk-action-trigger-rule).
+## Deploy through the IBM Cloud Functions console user interface
 
-Also, you'll need an IBM Cloud account and the latest [OpenWhisk command line tool (`wsk`) installed and on your PATH](https://github.com/IBM/openwhisk-action-trigger-rule/blob/master/docs/OPENWHISK.md).
+Choose "[Start Creating](https://console.bluemix.net/openwhisk/create)" and select "Deploy template" then [This template] from the list.
 
-As an alternative to this end-to-end example, you might also consider the more [basic "building block" version](https://github.com/IBM/ibm-cloud-functions-refarch-template) of this sample.
+A wizard will then take you through configuration and connection to event sources step-by-step. Behind the scenes, the UI uses `wskdeploy`, which you can also use from the CLI.
 
-## Steps
+## Deploy using the `wskdeploy` command line tool
 
-1. [Provision dependency service](#1-dependency-service)
-2. [Create Cloud Functions and mappings](#2-create-cloud-functions-and-mappings)
-3. [Delete actions and mappings](#3-delete-actions-and-mappings)
-4. [Recreate deployment manually](#4-recreate-deployment-manually)
+This approach will let you deploy the Cloud Functions using the manifest file available in the repository.
 
-# 1. Provision dependency service
+Download the latest `bx` CLI and Cloud Functions plugins and log into the IBM Cloud.
+
+Download the latest `wskdeploy` from the [release page](https://github.com/apache/incubator-openwhisk-wskdeploy/releases) of the [openwhisk-wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy) project.
+
+### Pre-requisites
 
 Log into the IBM Cloud and provision a [Service](https://console.ng.bluemix.net/catalog/services/) instance. 
 
-Copy `template.local.env` to a new file named `local.env` and update the `SERVICE_HOSTNAME`, `SERVICE_USERNAME`, `SERVICE_PASSWORD` and `SERVICE_DATABASE` for your MySQL instance.
+Copy `template.local.env` to a new file named `local.env` and update the `SERVICE_HOSTNAME`, `SERVICE_USERNAME`, `SERVICE_PASSWORD` and `SERVICE_DATABASE` for your Service instance.
 
-Or use the built in service credential injection...
-
-# 2. Create Cloud Functions and mappings
-
-`deploy.sh` is a convenience script reads the environment variables from `local.env` and creates the Cloud Functions and API mappings on your behalf. Later you will run these commands yourself.
+### Deployment
 
 ```bash
-./deploy.sh --install
+# Grab a copy of this repository
+git clone https://github.com/IBM/ibm-cloud-functions-refarch-template.git
+cd ibm-cloud-functions-refarch-template
+
+# Make service credentials available to the environment
+source local.env
+wsk package refresh
+
+# Deploy the packages, actions, triggers, and rules
+wskdeploy
 ```
-> **Note**: If you see any error messages, refer to the [Troubleshooting](#troubleshooting) section below. You can also explore [Alternative deployment methods](#alternative-deployment-methods).
 
-
-# 4. Delete actions and mappings
-
-Use `deploy.sh` again to tear down the OpenWhisk actions and mappings. You will recreate them step-by-step in the next section.
+### Undeploy
 
 ```bash
-./deploy.sh --uninstall
+# Deploy the packages, actions, triggers, and rules
+wskdeploy undeploy
 ```
 
-# 5. Recreate deployment manually
+## Alternative deployment methods
 
-This section provides a deeper look into what the `deploy.sh` script executes so that you understand how to work with OpenWhisk triggers, actions, rules, and packages in more detail.
+### Deploy manually with the `bx wsk` command line tool
 
-## 5.1 Create Cloud Functions to do the thing
+This approach shows you how to deploy individual the packages, actions, triggers, and rules with CLI commands. [See instructions here](docs/BX_WSK.md). It helps you understand and control the underlying deployment artifacts.
 
-Lorem ipsum.
+### Deploy with IBM Continuous Delivery
 
-```bash
-lorem ipsum
-```
+This approach sets up a continuous delivery pipeline that redeploys on changes to a personal clone of this repository. [See instructions here](docs/BX_CD.md). It may be of interest to setting up an overall software delivery lifecycle around Cloud Functions.
 
-## 5.2 Clean up
-
-Lorem ipsum.
-
-```bash
-lorem ipsum
-```
-
-# Troubleshooting
-
-Check for errors first in the OpenWhisk activation log. Tail the log on the command line with `wsk activation poll` or drill into details visually with the [monitoring console on the IBM Cloud](https://console.ng.bluemix.net/openwhisk/dashboard).
-
-If the error is not immediately obvious, make sure you have the [latest version of the `wsk` CLI installed](https://console.ng.bluemix.net/openwhisk/learn/cli). If it's older than a few weeks, download an update.
-
-```bash
-wsk property get --cliversion
-```
-
-# Alternative deployment methods
-
-`deploy.sh` will be replaced with [`wskdeploy`](https://github.com/openwhisk/openwhisk-wskdeploy) in the future. `wskdeploy` uses a manifest to deploy declared triggers, actions, and rules to OpenWhisk.
-
-You can also use the following button to clone a copy of this repository and deploy to the IBM Cloud as part of a DevOps toolchain. Supply your OpenWhisk and MySQL credentials under the Delivery Pipeline icon, click Create, then run the Deploy stage for the Delivery Pipeline.
-
-[![Deploy to the IBM Cloud](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/IBM/ibm-cloud-functions-refarch-template.git)
-
-# License
+## License
 
 [Apache 2.0](LICENSE)
