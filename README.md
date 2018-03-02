@@ -30,9 +30,9 @@ Download the latest `bx` CLI and Cloud Functions plugins and log into the IBM Cl
 
 Download the latest `wskdeploy` from the [release page](https://github.com/apache/incubator-openwhisk-wskdeploy/releases) of the [openwhisk-wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy) project.
 
-### Pre-requisites
+### Prerequisites
 
-Log into the IBM Cloud and provision a [Service](https://console.ng.bluemix.net/catalog/services/) instance. 
+Log into the IBM Cloud and provision a [Service](https://console.ng.bluemix.net/catalog/services/) instance.
 
 Copy `template.local.env` to a new file named `local.env` and update the `SERVICE_HOSTNAME`, `SERVICE_USERNAME`, `SERVICE_PASSWORD` and `SERVICE_DATABASE` for your Service instance.
 
@@ -62,11 +62,11 @@ wskdeploy undeploy
 
 ### Deploy manually with the `bx wsk` command line tool
 
-This approach shows you how to deploy individual the packages, actions, triggers, and rules with CLI commands. [See instructions here](docs/BX_WSK.md). It helps you understand and control the underlying deployment artifacts.
+This approach shows you how to deploy individual the packages, actions, triggers, and rules with CLI commands. [See instructions here](bx-wsk/README.md). It helps you understand and control the underlying deployment artifacts.
 
 ### Deploy with IBM Continuous Delivery
 
-This approach sets up a continuous delivery pipeline that redeploys on changes to a personal clone of this repository. [See instructions here](docs/BX_CD.md). It may be of interest to setting up an overall software delivery lifecycle around Cloud Functions.
+This approach sets up a continuous delivery pipeline that redeploys on changes to a personal clone of this repository. [See instructions here](bx-cd/README.md). It may be of interest to setting up an overall software delivery lifecycle around Cloud Functions.
 
 ## License
 
