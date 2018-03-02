@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Message Hub Data Processing with OpenWhisk Toolchain Deployment to Bluemix",
-    "description": "Message Hub data processing with OpenWhisk toolchain",
+    "description": "IBM Cloud Function reference architecture template with IBM Cloud Function toolchain",
     "longDescription": "Information entered here will be used at deployment time.",
     "type": "object",
     "properties": {
@@ -17,12 +17,12 @@
             "description": "Deploy to this space",
             "type": "string"
         },
-        "openwhisk-api-endpoint": {
-            "description": "OpenWhisk API endpoint",
+        "cloud-functions-api-endpoint": {
+            "description": "IBM Cloud Functions API endpoint",
             "type": "string"
         },
-        "openwhisk-auth-key": {
-            "description": "OpenWhisk authorization key: copy the authorization key from https://console.ng.bluemix.net/openwhisk/learn/cli",
+        "cloud-functions-api-key": {
+            "description": "IBM Cloud Functions API key: copy the API key from https://console.ng.bluemix.net/openwhisk/learn/cli",
             "type": "password"
         },
         "message-hub-api-key": {
@@ -50,7 +50,7 @@
             "type": "string"
         },
         "message-hub-out-topic": {
-            "description": "Destination topic URL, copy from Message Hub manageconsole",
+            "description": "Destination topic URL, copy from Message Hub manage console",
             "type": "string"
         }
     },
@@ -58,8 +58,8 @@
         "deploy-region",
         "deploy-org",
         "deploy-space",
-        "openwhisk-auth-key",
-        "openwhisk-api-endpoint",
+        "cloud-functions-api-key",
+        "cloud-functions-api-endpoint",
         "message-hub-api-key",
         "message-hub-user",
         "message-hub-password",
@@ -77,14 +77,14 @@
         {
             "type": "text",
             "readonly": false,
-            "title": "OpenWhisk API Endpoint",
-            "key": "openwhisk-api-endpoint"
+            "title": "IBM Cloud Functions API Endpoint",
+            "key": "cloud-functions-api-endpoint"
         },
         {
             "type": "text",
             "readonly": false,
-            "title": "OpenWhisk Auth Key",
-            "key": "openwhisk-auth-key"
+            "title": "IBM Cloud Functions Auth Key",
+            "key": "cloud-functions-api-key"
         },
         {
             "type": "text",
