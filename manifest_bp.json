@@ -2,10 +2,10 @@
     "name": "New Template Item",
     "description": "This reference architecture deploys a new ... .",
     "long_description": "This template will create an action and a trigger that will kick off that action. The trigger is fired whenever there is a new item added to the ... instance and queue chosen when you create this template.",
-    "url": "https://github.com/zachschultz/owbp-message-hub-trigger",
+    "url": "https://github.com/IBM/ibm-cloud-functions-refarch-template",
     "runtime": {
-      "name": "Node.js 6",
-      "kind": "nodejs:6",
+      "name": "Node.js 8",
+      "kind": "nodejs:8",
       "type": "nodejs"
     },
     "categories": [
