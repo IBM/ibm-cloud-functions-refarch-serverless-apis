@@ -18,32 +18,27 @@ If you haven't already, sign up for an IBM Cloud account and go to the [Cloud Fu
 
 ## Deploy through the IBM Cloud Functions console user interface
 
-Choose "[Start Creating](https://console.bluemix.net/openwhisk/create)" and select "Deploy template" then [This template] from the list.
+Choose "[Start Creating](https://console.bluemix.net/openwhisk/create)" and select "Deploy template" then [This template] from the list. A wizard will then take you through configuration and connection to event sources step-by-step.
 
-A wizard will then take you through configuration and connection to event sources step-by-step. Behind the scenes, the UI uses `wskdeploy`, which you can also use from the CLI by following the steps in the next section.
+Behind the scenes, the UI uses `wskdeploy`, which you can also use directly from the CLI by following the steps in the next section.
 
 ## Deploy using the `wskdeploy` command line tool
 
-This approach will let you deploy the Cloud Functions with one command driven by the manifest file available in this repository.
+This approach deploy the Cloud Functions with one command driven by the runtime-specific manifest file available in this repository.
 
-Download the latest `bx` CLI and Cloud Functions plugins and log into the IBM Cloud.
-
-Download the latest `wskdeploy` from the [release page](https://github.com/apache/incubator-openwhisk-wskdeploy/releases) of the [openwhisk-wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy) project.
-
-### Prerequisites
-
-Log into the IBM Cloud and provision a [Service](https://console.ng.bluemix.net/catalog/services/) instance.
-
-Copy `template.local.env` to a new file named `local.env` and update the `SERVICE_HOSTNAME`, `SERVICE_USERNAME`, `SERVICE_PASSWORD` and `SERVICE_DATABASE` for your Service instance.
+- Download the latest `bx` CLI and Cloud Functions plugins and log into the IBM Cloud.
+- Download the latest `wskdeploy` from the [release page](https://github.com/apache/incubator-openwhisk-wskdeploy/releases) of the [openwhisk-wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy) project.
+- Provision a [Service](https://console.ng.bluemix.net/catalog/services/) instance.
+- Copy `template.local.env` to a new file named `local.env` and update the `SERVICE_HOSTNAME`, `SERVICE_USERNAME`, `SERVICE_PASSWORD` and `SERVICE_DATABASE` for your Service instance.
 
 ### Deployment
 
 ```bash
-# Grab a copy of this repository
+# Get a local copy of this repository
 git clone https://github.com/IBM/ibm-cloud-functions-refarch-template.git
 cd ibm-cloud-functions-refarch-template
 
-# Make service credentials available to the environment
+# Make service credentials available to your environment
 source local.env
 wsk package refresh
 
