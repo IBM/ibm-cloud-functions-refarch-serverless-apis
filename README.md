@@ -20,11 +20,11 @@ If you haven't already, sign up for an IBM Cloud account and go to the [Cloud Fu
 
 Choose "[Start Creating](https://console.bluemix.net/openwhisk/create)" and select "Deploy template" then [This template] from the list.
 
-A wizard will then take you through configuration and connection to event sources step-by-step. Behind the scenes, the UI uses `wskdeploy`, which you can also use from the CLI.
+A wizard will then take you through configuration and connection to event sources step-by-step. Behind the scenes, the UI uses `wskdeploy`, which you can also use from the CLI by following the steps in the next section.
 
 ## Deploy using the `wskdeploy` command line tool
 
-This approach will let you deploy the Cloud Functions using the manifest file available in the repository.
+This approach will let you deploy the Cloud Functions with one command driven by the manifest file available in this repository.
 
 Download the latest `bx` CLI and Cloud Functions plugins and log into the IBM Cloud.
 
@@ -47,7 +47,8 @@ cd ibm-cloud-functions-refarch-template
 source local.env
 wsk package refresh
 
-# Deploy the packages, actions, triggers, and rules
+# Deploy the packages, actions, triggers, and rules using your preferred language
+cd runtimes/nodejs # Or runtimes/[php|python|swift]
 wskdeploy
 ```
 
