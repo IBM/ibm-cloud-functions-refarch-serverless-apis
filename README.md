@@ -2,19 +2,23 @@
 
 [![Build Status](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template.svg?branch=master)](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template)
 
-This reference architecture shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from [...]. 
+This reference architecture shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from [...]. No code runs until [...] When that happens, application instances are started to match the load needed by each [...] exactly.
 
-No resources are consumed until [...] When that happens, application instances are started to match the load needed by each [...] exactly. In addition to using cloud resources efficiently, this means that developers can build and deploy applications more quickly. You can learn more about the benefits of building a serverless architecture for this use case in the accompanying [IBM Code Pattern](https://developer.ibm.com/code/technologies/serverless/).
+In addition to using cloud resources efficiently, this means that developers can build and deploy applications more quickly. You can learn more about the benefits of building a serverless architecture for this use case in the accompanying [IBM Code Pattern](https://developer.ibm.com/code/technologies/serverless/).
 
 This repository provides a template skeleton for IBM Cloud Functions reference architectures. You can deploy it right away using the [IBM Cloud Functions user interface](#deploy-through-the-ibm-cloud-functions-console-user-interface), or setup and deploy using [command line tools on your own system](#deploy-using-the-wskdeploy-command-line-tool).
 
-If you haven't already, sign up for an IBM Cloud account and go to the [Cloud Functions dashboard](https://console.bluemix.net/openwhisk/) to explore other reference architecture templates and download command line tools, if needed.
+If you haven't already, sign up for an IBM Cloud account and go to the [Cloud Functions dashboard](https://console.bluemix.net/openwhisk/) to explore other [reference architecture templates](https://github.com/topics/ibm-cloud-functions-refarch) and download command line tools, if needed.
 
 ## Included components
 
 - IBM Cloud Functions (powered by Apache OpenWhisk)
 - Service A (Powered by open source project A)
 - Service B (Powered by open source project B)
+
+The application demonstrates two IBM Cloud Functions (based on Apache OpenWhisk) that [...]. The use case demonstrates how actions work with data services and execute logic in response to [...] events.
+
+One function, or action, is triggered by [...]. These [...] are piped to another action in a sequence (a way to link actions declaratively in a chain). The second action aggregates the [...] and [...].
 
 ![Sample Architecture](img/refarch-placeholder.png)
 
