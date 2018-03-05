@@ -1,8 +1,10 @@
-# Reference architecture with IBM Cloud Functions (powered by Apache OpenWhisk)
+# Serverless reference architecture with IBM Cloud Functions (powered by Apache OpenWhisk)
 
 [![Build Status](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template.svg?branch=master)](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template)
 
-This project shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from [...]. No resources are consumed until [...] When they are called, resources are provisioned to exactly match the current load needed by each [...]. In addition to using cloud resources efficiently, this means that developers can build and deploy applications more quickly.
+This project shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from [...]. 
+
+No resources are consumed until [...] When they are called, resources are provisioned to exactly match the current load needed by each [...]. In addition to using cloud resources efficiently, this means that developers can build and deploy applications more quickly. You can learn more about the benefits of building a serverless architecture for this use case in the accompanying IBM Code Pattern.
 
 This reference architecture template provides a skeleton for IBM Cloud Functions reference architectures. You can deploy it right away using the [IBM Cloud Functions user interface](#deploy-through-the-ibm-cloud-functions-console-user-interface), or setup and deploy using [command line tools on your own system](#deploy-using-the-wskdeploy-command-line-tool).
 
