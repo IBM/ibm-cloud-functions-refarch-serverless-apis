@@ -1,14 +1,14 @@
 # Serverless reference architecture with IBM Cloud Functions (powered by Apache OpenWhisk)
 
-[![Build Status](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template.svg?branch=master)](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template)
+[![Build Status](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template.svg?branch=master)](https://travis-ci.org/IBM/ibm-cloud-functions-refasrch-template)
 
-This project shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from [...]. 
+This reference architecture shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from [...]. 
 
-No resources are consumed until [...] When they are called, resources are provisioned to exactly match the current load needed by each [...]. In addition to using cloud resources efficiently, this means that developers can build and deploy applications more quickly. You can learn more about the benefits of building a serverless architecture for this use case in the accompanying IBM Code Pattern.
+No resources are consumed until [...] When that happens, application instances are started to match the load needed by each [...] exactly. In addition to using cloud resources efficiently, this means that developers can build and deploy applications more quickly. You can learn more about the benefits of building a serverless architecture for this use case in the accompanying [IBM Code Pattern](https://developer.ibm.com/code/technologies/serverless/).
 
-This reference architecture template provides a skeleton for IBM Cloud Functions reference architectures. You can deploy it right away using the [IBM Cloud Functions user interface](#deploy-through-the-ibm-cloud-functions-console-user-interface), or setup and deploy using [command line tools on your own system](#deploy-using-the-wskdeploy-command-line-tool).
+This repository provides a template skeleton for IBM Cloud Functions reference architectures. You can deploy it right away using the [IBM Cloud Functions user interface](#deploy-through-the-ibm-cloud-functions-console-user-interface), or setup and deploy using [command line tools on your own system](#deploy-using-the-wskdeploy-command-line-tool).
 
-If you haven't already, sign up for an IBM Cloud account and go to the [Cloud Functions dashboard](https://console.bluemix.net/openwhisk/) to explore reference architecture templates and download command line tools, if needed.
+If you haven't already, sign up for an IBM Cloud account and go to the [Cloud Functions dashboard](https://console.bluemix.net/openwhisk/) to explore other reference architecture templates and download command line tools, if needed.
 
 ## Included components
 
