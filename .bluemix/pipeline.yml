@@ -1,0 +1,72 @@
+---
+stages:
+- name: Deploy
+  inputs:
+  - service: ${REPO}
+    type: git
+    branch: master
+    dir_name: null
+  triggers:
+  - type: commit
+  properties:
+  - name: CLOUD_FUNCTIONS_API_ENDPOINT
+    value: ${CLOUD_FUNCTIONS_API_ENDPOINT}
+    type: text
+  - name: CLOUD_FUNCTIONS_API_KEY
+    value: ${CLOUD_FUNCTIONS_API_KEY}
+    type: secure
+  - name: CLOUDANT_INSTANCE
+    value: ${CLOUDANT_INSTANCE}
+    type: text
+  - name: CLOUDANT_USERNAME
+    value: ${CLOUDANT_USERNAME}
+    type: text
+  - name: CLOUDANT_DATABASE
+    value: ${CLOUDANT_DATABASE}
+    type: text
+  - name: CLOUDANT_PASSWORD
+    value: ${CLOUDANT_PASSWORD}
+    type: secure
+  jobs:
+  - name: Deploy
+    type: deployer
+    target:
+      region_id: ${REGION}
+      organization: ${ORG}
+      space: ${SPACE}
+      application: cloudantdataprocessing
+    script: |+
+      #!/bin/bash
+      set -e
+
+      # Write the Cloud Functions specific values to .wskprops
+      echo "APIHOST=$CLOUD_FUNCTIONS_API_ENDPOINT" > "$HOME/.wskprops"
+      echo "NAMESPACE=_" >> "$HOME/.wskprops"
+      echo "APIVERSION=v1" >> "$HOME/.wskprops"
+      echo "AUTH=$CLOUD_FUNCTIONS_API_KEY" >> "$HOME/.wskprops"
+      echo "APIGW_ACCESS_TOKEN=" >> "$HOME/.wskprops"
+
+      # Map the expected environment variables to what's been supplied
+      export CLOUDANT_INSTANCE=$CLOUDANT_INSTANCE
+      export CLOUDANT_USERNAME=$CLOUDANT_USERNAME
+      export CLOUDANT_DATABASE=$CLOUDANT_DATABASE
+      export CLOUDANT_PASSWORD=$CLOUDANT_PASSWORD
+
+      # Download the wskdeploy CLI
+      curl -OL https://github.com/apache/incubator-openwhisk-wskdeploy/releases/download/latest/wskdeploy-latest-linux-amd64.tgz
+      tar xf wskdeploy-latest-linux-amd64.tgz
+      chmod 755 wskdeploy
+
+      # Make service credentials available to your environment
+      bx wsk package refresh
+
+      # Deploy the packages, actions, triggers, and rules using your preferred language
+      mv wskdeploy runtimes/nodejs/
+      cd runtimes/nodejs # Or runtimes/[php|python|swift]
+      ./wskdeploy
+
+hooks:
+- enabled: true
+  label: null
+  ssl_enabled: false
+  url: https://devops-api.ng.bluemix.net/v1/messaging/webhook/publish
