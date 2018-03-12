@@ -1,0 +1,16 @@
+{
+  "name": "Reference architecture for processing IBM Cloudant database changes with IBM Cloud Functions",
+  "description": "Create a serverless, event-driven architectures with IBM Cloud Functions to execute code in response to database changes.",
+  "long_description": "This template will create an action and a trigger that will kick off that action. The trigger is fired whenever there is a new item added to the ... instance and queue chosen when you create this template.",
+  "url": "https://github.com/IBM/ibm-cloud-functions-refarch-serverless-apis",
+  "runtime": {
+    "name": "Node.js 8",
+    "kind": "nodejs:8",
+    "type": "nodejs"
+  },
+  "categories": [
+    "nodejs",
+    "template",
+    "refarch"
+  ]
+}
