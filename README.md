@@ -1,4 +1,4 @@
-# Serverless reference architecture with IBM Cloud Functions (powered by Apache OpenWhisk)
+# Serverless REST API with IBM Cloud Functions (powered by Apache OpenWhisk)
 
 [![Build Status](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template.svg?branch=master)](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template)
 
