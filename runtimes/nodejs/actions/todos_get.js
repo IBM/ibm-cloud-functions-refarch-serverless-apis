@@ -11,15 +11,16 @@ var todo_db_name = "todos"
 var content_type_header = {'Content-Type': 'application/json'}
 var api_root_url = 'https://mycoolapi.me/todo'
 
-function getHandler(params) {
+function main(params) {
   return new Promise(function(resolve, reject) {
     asyncSafeDbCreate()
     .then(function() {
       todo_db = cloudant.db.use(todo_db_name)
-      if (params.__ow_path == "") {
+      item_path = params.__ow_path.replace(/^\/+/g, '')
+      if (item_path == "") {
         return asyncToDoList(todo_db)
       } else {
-        return asyncToDoGet(todo_db, params.__ow_path)
+        return asyncToDoGet(todo_db, item_path)
       }
     })
     .then(function(response_body) {
@@ -30,13 +31,24 @@ function getHandler(params) {
       })
     })
     .catch(function(err) {
-      reject({
-        headers: content_type_header,
-        statusCode: 500,
-        body: {
-          error: err
-        }
-      })
+      // If not found, we send a nicer error
+      if (err._data.error == 'not_found') {
+        reject({
+          statusCode: 404,
+          headers: content_type_header,
+          body: {
+            error: err._data.error
+          }
+        })
+      } else {
+        reject({
+          statusCode: 500,
+          headers: content_type_header,
+          body: {
+            error: err
+          }
+        })
+      }
     })
   })
 }
@@ -45,15 +57,10 @@ function asyncToDoGet(todo_db, item) {
   return new Promise(function(resolve, reject) {
     found_todo = todo_db.get(item)
     .then(function(found_todo) {
-      console.log("Get: %s, found: %s", item, found_todo)
-      if (found_todo == {}) {
-        resolve(found_todo)
-      } else {
-        resolve(prepareToDo(found_todo))
-      }
+      resolve(prepareToDo(found_todo))
     })
     .catch(function(err) {
-      reject(err)
+        reject(err)
     })
   })
 }
@@ -110,5 +117,3 @@ function prepareToDo(todo) {
   todo.url = api_root_url + '/' + id
   return todo
 }
-
-exports.main = getHandler;

@@ -1,8 +1,8 @@
 {
-    "name": "New Template Item",
-    "description": "This reference architecture deploys a new ... .",
-    "long_description": "This template will create an action and a trigger that will kick off that action. The trigger is fired whenever there is a new item added to the ... instance and queue chosen when you create this template.",
-    "url": "https://github.com/IBM/ibm-cloud-functions-refarch-template",
+    "name": "Rest API with IBM Cloud Functions",
+    "description": "This reference architecture deploys a set of functions to implement a Rest API",
+    "long_description": "This template will create a set of web actions that implement a Rest API. The implemented API is a valid backed for the ToDo Backend project.",
+    "url": "https://github.com/IBM/ibm-cloud-functions-rest-api",
     "runtime": {
       "name": "Node.js 8",
       "kind": "nodejs:8",
@@ -10,7 +10,7 @@
     },
     "categories": [
       "nodejs",
-      "template",
-      "refarch"
+      "api",
+      "cloudant"
     ]
   }
