@@ -47,10 +47,17 @@ packages:
         function: actions/get
         runtime: nodejs:8
         web-export: true
+      delete_todo:
+        function: actions/delete
+        runtime: nodejs:8
+        web-export: true
     apis:
       todos:
         /v1:
           /todo:
             get_todo:
               method: GET
+              response: http
+            delete_todo:
+              method: DELETE
               response: http

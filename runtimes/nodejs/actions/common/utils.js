@@ -53,6 +53,22 @@ function asyncToDoList(todo_db, api_root_url) {
   })
 }
 
+function asyncToDoDelete(todo_db, api_root_url, item) {
+  return new Promise(function(resolve, reject) {
+    found_todo = todo_db.get(item)
+    .then(function(found_todo) {
+      return(todo_db.destroy(found_todo._id, found_todo._rev))
+    })
+    .then(function(destroyed) {
+      // We return nothing on DELETE
+      resolve({})
+    })
+    .catch(function(err) {
+      reject(err)
+    })
+  })
+}
+
 function asyncSafeDbCreate(cloudant_db, db_name) {
   return new Promise(function(resolve, reject) {
     cloudant_db.create(db_name)
@@ -118,6 +134,7 @@ module.exports = {
   getToDoID: getToDoID,
   asyncToDoGet: asyncToDoGet,
   asyncToDoList: asyncToDoList,
+  asyncToDoDelete: asyncToDoDelete,
   asyncSafeDbCreate: asyncSafeDbCreate,
   resolveSuccessFunction: resolveSuccessFunction,
   rejectErrorsFunction:rejectErrorsFunction
