@@ -3,3 +3,4 @@ local.env
 
 # NodeJS specific
 node_modules/
+runtimes/nodejs/actions/*/common

@@ -44,7 +44,7 @@ packages:
           value: ${API_BASE_URL}/v1/todo
     actions:
       get_todo:
-        function: actions/todos_get.js
+        function: actions/get
         runtime: nodejs:8
         web-export: true
     apis:

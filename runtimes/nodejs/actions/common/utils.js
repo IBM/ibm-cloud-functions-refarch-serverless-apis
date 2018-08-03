@@ -1,55 +1,16 @@
-// Load the Cloudant library.
+// Common CRUD functions for the Cloudant backend
 var Cloudant = require('@cloudant/cloudant');
-
-var todo_db_name = "todos"
 var content_type_header = {'Content-Type': 'application/json'}
 
-function main(params) {
+function getDb(params) {
   // Initialize Cloudant from inputs
-  var api_root_url = params.base_url;
   var username = params.username;
   var password = params.password;
-  var cloudant = new Cloudant({account:username, password:password, plugins: 'promises'});
+  return new Cloudant({account:username, password:password, plugins: 'promises'});
+}
 
-  return new Promise(function(resolve, reject) {
-    asyncSafeDbCreate(cloudant.db)
-    .then(function() {
-      todo_db = cloudant.db.use(todo_db_name)
-      item_path = params.__ow_path.replace(/^\/+/g, '')
-      if (item_path == "") {
-        return asyncToDoList(todo_db, api_root_url)
-      } else {
-        return asyncToDoGet(todo_db, api_root_url, item_path)
-      }
-    })
-    .then(function(response_body) {
-      resolve({
-        headers: content_type_header,
-        statusCode: 200,
-        body: response_body
-      })
-    })
-    .catch(function(err) {
-      // If not found, we send a nicer error
-      if (err._data.error == 'not_found') {
-        reject({
-          statusCode: 404,
-          headers: content_type_header,
-          body: {
-            error: err._data.error
-          }
-        })
-      } else {
-        reject({
-          statusCode: 500,
-          headers: content_type_header,
-          body: {
-            error: err
-          }
-        })
-      }
-    })
-  })
+function getToDoID(params) {
+  return params.__ow_path.replace(/^\/+/g, '')
 }
 
 function asyncToDoGet(todo_db, api_root_url, item) {
@@ -92,9 +53,9 @@ function asyncToDoList(todo_db, api_root_url) {
   })
 }
 
-function asyncSafeDbCreate(cloudant_db) {
+function asyncSafeDbCreate(cloudant_db, db_name) {
   return new Promise(function(resolve, reject) {
-    cloudant_db.create(todo_db_name)
+    cloudant_db.create(db_name)
     .catch(function(err) {
       if (err._data.error == 'file_exists') {
         console.log("DB already exists")
@@ -115,4 +76,49 @@ function prepareToDo(todo, api_root_url) {
   delete todo._id
   todo.url = api_root_url + '/' + id
   return todo
+}
+
+function resolveSuccessFunction(resolve) {
+  return function(response_body) {
+    resolve({
+      headers: content_type_header,
+      statusCode: 200,
+      body: response_body
+    })
+  }
+}
+
+function rejectErrorsFunction(reject) {
+  return function(err) {
+    console.log("Rejecting:", err)
+    // If not found, we send a 404 error. In any case we don't let the
+    // whole stack trace through to the API. We put it in the logs instead.
+    if (err._data.error == 'not_found') {
+      reject({
+        statusCode: 404,
+        headers: content_type_header,
+        body: {
+          error: err._data.error
+        }
+      })
+    } else {
+      reject({
+        statusCode: 500,
+        headers: content_type_header,
+        body: {
+          error: err._data.error
+        }
+      })
+    }
+  }
+}
+
+module.exports = {
+  getDb: getDb,
+  getToDoID: getToDoID,
+  asyncToDoGet: asyncToDoGet,
+  asyncToDoList: asyncToDoList,
+  asyncSafeDbCreate: asyncSafeDbCreate,
+  resolveSuccessFunction: resolveSuccessFunction,
+  rejectErrorsFunction:rejectErrorsFunction
 }
