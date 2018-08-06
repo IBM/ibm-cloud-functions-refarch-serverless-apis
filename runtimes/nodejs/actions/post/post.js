@@ -13,7 +13,7 @@ function postHandler(params) {
     .then(function() {
       todo_db = cloudant.db.use(todo_db_name)
       // Title is mandatory
-      if (not params.title) {
+      if (! params.title) {
         reject({
           statusCode: 400,
           headers: content_type_header,

@@ -1,6 +1,7 @@
 // Common CRUD functions for the Cloudant backend
 var Cloudant = require('@cloudant/cloudant');
-var content_type_header = {'Content-Type': 'application/json'}
+const content_type_header = {'Content-Type': 'application/json'}
+const valid_fields = ['title', 'order', 'completed']
 
 function getDb(params) {
   // Initialize Cloudant from inputs
@@ -72,13 +73,41 @@ function asyncToDoDelete(todo_db, api_root_url, item) {
 function asyncToDoPost(todo_db, api_root_url, params) {
   return new Promise(function(resolve, reject) {
     new_document = getDocumentFromParams(params)
-    console.log(new_document)
     return todo_db.insert(new_document)
     .then(function(created_todo) {
       return asyncToDoGet(todo_db, api_root_url, created_todo.id)
     })
     .then(function (retrieved_todo) {
-      console.log(retrieved_todo)
+      resolve(retrieved_todo)
+    })
+    .catch(function(err) {
+        reject(err)
+    })
+  })
+}
+
+function asyncToDoPatch(todo_db, api_root_url, todo_id, params) {
+  return new Promise(function(resolve, reject) {
+    return todo_db.get(todo_id)
+    .then(function(original) {
+      if (! original) {
+        reject({
+          statusCode: 404,
+          headers: content_type_header,
+          body: {
+            error: "Document to be patch could not be found."
+          }
+        })
+      } else {
+        patched_document = patchDocumentFromParams(original, params)
+        // Patched document still includes _id and _rev.
+        return todo_db.insert(patched_document)
+      }
+    })
+    .then(function(patched_todo) {
+      return asyncToDoGet(todo_db, api_root_url, patched_todo.id)
+    })
+    .then(function (retrieved_todo) {
       resolve(retrieved_todo)
     })
     .catch(function(err) {
@@ -150,13 +179,16 @@ function rejectErrorsFunction(reject) {
 function getDocumentFromParams(params) {
   // ID and invalid parameters in general, if passed in the original request
   // are ignored.
-  const valid_fields = ['title', 'order', 'completed']
   new_document = Object.keys(params).reduce(function(new_document, key) {
     if (valid_fields.includes(key)) new_document[key] = params[key]
     return new_document
   }, {})
-  console.log(new_document)
   return new_document
+}
+
+function patchDocumentFromParams(original, params) {
+  updates = getDocumentFromParams(params)
+  return Object.assign(original, updates)
 }
 
 module.exports = {
@@ -165,6 +197,7 @@ module.exports = {
   asyncToDoGet: asyncToDoGet,
   asyncToDoList: asyncToDoList,
   asyncToDoPost: asyncToDoPost,
+  asyncToDoPatch: asyncToDoPatch,
   asyncToDoDelete: asyncToDoDelete,
   asyncSafeDbCreate: asyncSafeDbCreate,
   resolveSuccessFunction: resolveSuccessFunction,
