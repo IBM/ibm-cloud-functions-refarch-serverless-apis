@@ -21,6 +21,7 @@ if [ ! -f local.env ]; then
   exit 1
 fi
 source local.env
+export CLOUDANT_USERNAME CLOUDANT_PASSWORD API_BASE_URL
 
 # Define useful folders
 root_folder=$(cd $(dirname $0); pwd)

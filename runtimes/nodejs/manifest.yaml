@@ -51,6 +51,10 @@ packages:
         function: actions/delete
         runtime: nodejs:8
         web-export: true
+      post_todo:
+        function: actions/post
+        runtime: nodejs:8
+        web-export: true
     apis:
       todos:
         /v1:
@@ -60,4 +64,7 @@ packages:
               response: http
             delete_todo:
               method: DELETE
+              response: http
+            post_todo:
+              method: POST
               response: http

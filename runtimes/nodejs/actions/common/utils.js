@@ -69,6 +69,24 @@ function asyncToDoDelete(todo_db, api_root_url, item) {
   })
 }
 
+function asyncToDoPost(todo_db, api_root_url, params) {
+  return new Promise(function(resolve, reject) {
+    new_document = getDocumentFromParams(params)
+    console.log(new_document)
+    return todo_db.insert(new_document)
+    .then(function(created_todo) {
+      return asyncToDoGet(todo_db, api_root_url, created_todo.id)
+    })
+    .then(function (retrieved_todo) {
+      console.log(retrieved_todo)
+      resolve(retrieved_todo)
+    })
+    .catch(function(err) {
+        reject(err)
+    })
+  })
+}
+
 function asyncSafeDbCreate(cloudant_db, db_name) {
   return new Promise(function(resolve, reject) {
     cloudant_db.create(db_name)
@@ -129,11 +147,24 @@ function rejectErrorsFunction(reject) {
   }
 }
 
+function getDocumentFromParams(params) {
+  // ID and invalid parameters in general, if passed in the original request
+  // are ignored.
+  const valid_fields = ['title', 'order', 'completed']
+  new_document = Object.keys(params).reduce(function(new_document, key) {
+    if (valid_fields.includes(key)) new_document[key] = params[key]
+    return new_document
+  }, {})
+  console.log(new_document)
+  return new_document
+}
+
 module.exports = {
   getDb: getDb,
   getToDoID: getToDoID,
   asyncToDoGet: asyncToDoGet,
   asyncToDoList: asyncToDoList,
+  asyncToDoPost: asyncToDoPost,
   asyncToDoDelete: asyncToDoDelete,
   asyncSafeDbCreate: asyncSafeDbCreate,
   resolveSuccessFunction: resolveSuccessFunction,
