@@ -54,7 +54,7 @@ function asyncToDoList(todo_db, api_root_url) {
   })
 }
 
-function asyncToDoDelete(todo_db, api_root_url, item) {
+function asyncToDoDelete(todo_db, item) {
   return new Promise(function(resolve, reject) {
     found_todo = todo_db.get(item)
     .then(function(found_todo) {
@@ -63,6 +63,34 @@ function asyncToDoDelete(todo_db, api_root_url, item) {
     .then(function(destroyed) {
       // We return nothing on DELETE
       resolve({})
+    })
+    .catch(function(err) {
+      reject(err)
+    })
+  })
+}
+
+function asyncToDoDeleteAll(todo_db) {
+  return new Promise(function(resolve, reject) {
+    found_todos = todo_db.list()
+    .then(function(found_todos) {
+      if (found_todos.total_rows == 0) {
+        resolve([])
+      } else {
+        // Get the list of keys to fetch
+        var bulk_delete_params = found_todos.rows.map(function(row) {
+          return {
+            '_id' : row.key,
+            '_rev': row.value.rev,
+            '_deleted': true
+          }
+        })
+        return todo_db.bulk({'docs': bulk_delete_params})
+      }
+    })
+    .then(function(destroyed) {
+      // We return nothing on DELETE
+      resolve([])
     })
     .catch(function(err) {
       reject(err)
@@ -183,6 +211,8 @@ function getDocumentFromParams(params) {
     if (valid_fields.includes(key)) new_document[key] = params[key]
     return new_document
   }, {})
+  // Set a default value for completed
+  if (! new_document.completed) new_document.completed = false
   return new_document
 }
 
@@ -199,6 +229,7 @@ module.exports = {
   asyncToDoPost: asyncToDoPost,
   asyncToDoPatch: asyncToDoPatch,
   asyncToDoDelete: asyncToDoDelete,
+  asyncToDoDeleteAll: asyncToDoDeleteAll,
   asyncSafeDbCreate: asyncSafeDbCreate,
   resolveSuccessFunction: resolveSuccessFunction,
   rejectErrorsFunction:rejectErrorsFunction
