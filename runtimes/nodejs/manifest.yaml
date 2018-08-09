@@ -17,11 +17,6 @@ project:
       description: The password from the IBM Cloudant service credentials
       required: true
       value: password
-    API_BASE_URL:
-      type: string
-      description: The base URL where the REST API is exposed
-      required: true
-      value: https://api.url
 packages:
   todo_package:
     version: 1.0
@@ -37,11 +32,6 @@ packages:
           description: CLOUDANT_PASSWORD
           required: true
           value: $CLOUDANT_PASSWORD
-      base_url:
-          type: string
-          description: The base URL where the REST API is exposed, including base path and path
-          required: true
-          value: ${API_BASE_URL}/v1/todo
     actions:
       get_todo:
         function: actions/get

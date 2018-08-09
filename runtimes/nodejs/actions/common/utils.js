@@ -5,6 +5,7 @@ const valid_fields = ['title', 'order', 'completed']
 
 function getDb(params) {
   // Initialize Cloudant from inputs
+  console.log("Call params: ", params)
   var username = params.username;
   var password = params.password;
   return new Cloudant({account:username, password:password, plugins: 'promises'});

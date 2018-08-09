@@ -42,7 +42,7 @@ function install() {
   wskdeploy -p ${nodejs_folder}/ $@
   # If AppID is enabled update the API definition to include the AppID tenant
   if [ "$API_USE_APPID" == "true" ]; then
-    ibmcloud fn get todos --format json | \
+    ibmcloud fn api get todos --format json | \
       python ${root_folder}/appid/api_def_add_auth.py $API_APPID_TENANTID \
       > ${root_folder}/appid/_api_definition.json
     ibmcloud fn api create -c ${root_folder}/appid/_api_definition.json

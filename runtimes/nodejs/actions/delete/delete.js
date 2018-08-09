@@ -4,7 +4,7 @@ var common = require('./common/utils.js')
 var todo_db_name = "todos"
 
 function deleteHandler(params) {
-  var api_root_url = params.base_url;
+  var api_root_url = params.__ow_headers['x-forwarded-url'];
   cloudant = common.getDb(params)
 
   return new Promise(function(resolve, reject) {
