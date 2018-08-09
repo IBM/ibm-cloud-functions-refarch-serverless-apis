@@ -4,3 +4,6 @@ local.env
 # NodeJS specific
 node_modules/
 runtimes/nodejs/actions/*/common
+
+# AppID
+appid/_api_definition.json
