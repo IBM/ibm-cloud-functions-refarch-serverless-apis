@@ -11,6 +11,21 @@ function getDb(params) {
   return new Cloudant({account:username, password:password, plugins: 'promises'});
 }
 
+function getDbName(params) {
+  auth_header = params.__ow_headers.authorization
+  if (auth_header) {
+    // The request is authenticated via AppID with a JWT token
+    jwt_token = auth_header.split(' ')[1]
+    b64_payload = jwt_token.split('.')[1]
+    payload = new Buffer(b64_payload, 'base64').toString('ascii')
+    subject = JSON.parse(payload)['sub']
+    console.log("subject:", subject)
+    return "todos_" + subject
+  } else {
+    return "todos"
+  }
+}
+
 function getToDoID(params) {
   return params.__ow_path.replace(/^\/+/g, '')
 }
@@ -225,6 +240,7 @@ function patchDocumentFromParams(original, params) {
 module.exports = {
   getDb: getDb,
   getToDoID: getToDoID,
+  getDbName: getDbName,
   asyncToDoGet: asyncToDoGet,
   asyncToDoList: asyncToDoList,
   asyncToDoPost: asyncToDoPost,
