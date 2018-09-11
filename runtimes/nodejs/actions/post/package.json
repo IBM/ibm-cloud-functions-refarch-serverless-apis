@@ -1,7 +1,0 @@
-{
-	"name": "todo-post",
-	"description": "Handle POST requests for the TODO API",
-	"license": "Apache-2.0",
-	"version": "1.0.0",
-	"main": "post.js"
-}

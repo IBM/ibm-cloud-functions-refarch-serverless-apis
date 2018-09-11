@@ -34,21 +34,25 @@ packages:
           value: $CLOUDANT_PASSWORD
     actions:
       get_todo:
-        function: actions/get
+        function: actions
         runtime: nodejs:8
         web-export: true
+        main: get
       delete_todo:
-        function: actions/delete
+        function: actions
         runtime: nodejs:8
         web-export: true
+        main: delete
       post_todo:
-        function: actions/post
+        function: actions
         runtime: nodejs:8
         web-export: true
+        main: post
       patch_todo:
-        function: actions/patch
+        function: actions
         runtime: nodejs:8
         web-export: true
+        main: patch
     apis:
       todos:
         /v1:

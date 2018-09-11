@@ -1,7 +1,0 @@
-{
-	"name": "todo-patch",
-	"description": "Handle PATCH requests for the TODO API",
-	"license": "Apache-2.0",
-	"version": "1.0.0",
-	"main": "patch.js"
-}
