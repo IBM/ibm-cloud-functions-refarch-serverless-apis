@@ -33,6 +33,11 @@ function usage() {
 }
 
 function install() {
+  # Ensure the latest JS shared code is available to all actions
+  for action in get post delete patch; do
+    rm -rf ${actions_folder}/${action}/common
+    cp -r ${actions_folder}/common ${actions_folder}/${action}/
+  done
   shift
   wskdeploy -p ${nodejs_folder}/ $@
   # If AppID is enabled update the API definition to include the AppID tenant

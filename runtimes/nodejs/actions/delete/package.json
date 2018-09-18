@@ -1,0 +1,7 @@
+{
+	"name": "todo-delete",
+	"description": "Handle DELETE requests for the TODO API",
+	"license": "Apache-2.0",
+	"version": "1.0.0",
+	"main": "delete.js"
+}
