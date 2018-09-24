@@ -6,3 +6,7 @@ node_modules/
 
 # AppID
 appid/_api_definition.json
+
+# Terraform
+infra/.terraform*
+infra/terraform.tfstate*
