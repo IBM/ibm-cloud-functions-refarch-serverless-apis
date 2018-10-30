@@ -36,18 +36,26 @@ packages:
       get_todo:
         function: actions/get
         runtime: nodejs:8
+        include:
+           - ["actions/common/utils.js", "common/utils.js"]
         web-export: true
       delete_todo:
         function: actions/delete
         runtime: nodejs:8
+        include:
+           - ["actions/common/utils.js", "common/utils.js"]
         web-export: true
       post_todo:
         function: actions/post
         runtime: nodejs:8
+        include:
+           - ["actions/common/utils.js", "common/utils.js"]
         web-export: true
       patch_todo:
         function: actions/patch
         runtime: nodejs:8
+        include:
+           - ["actions/common/utils.js", "common/utils.js"]
         web-export: true
     apis:
       todos:
