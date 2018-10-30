@@ -30,7 +30,7 @@ nodejs_folder=${root_folder}/runtimes/nodejs
 actions_folder=${nodejs_folder}/actions
 
 function usage() {
-  echo -e "Usage: $0 [--install,--uninstall,--env] [extra wskdeploy params]"
+  echo -e "Usage: $0 [--install,--uninstall,--env,--demo] [extra wskdeploy params]"
 }
 
 function install() {

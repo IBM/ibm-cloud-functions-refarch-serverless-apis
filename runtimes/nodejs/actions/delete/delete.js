@@ -2,7 +2,11 @@
 var common = require('./common/utils.js')
 
 function deleteHandler(params) {
-  var api_root_url = params.__ow_headers['x-forwarded-url'];
+  var headers = params.__ow_headers
+  var api_root_url = '<undefined>'
+  if (headers) {
+    var api_root_url = headers['x-forwarded-url'];
+  }
   cloudant = common.getDb(params)
 
   return new Promise(function(resolve, reject) {
