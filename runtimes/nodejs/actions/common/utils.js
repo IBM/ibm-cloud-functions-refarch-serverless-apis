@@ -29,8 +29,10 @@ function getDbName(params) {
 }
 
 function getToDoID(params) {
-  todo_path = params.__ow_path
-  if (todo_path) {
+  full_path = params.__ow_path
+  base_path = params['base_path']
+  if (full_path) {
+    todo_path = full_path.replace(base_path, '')
     return todo_path.replace(/^\/+/g, '')
   }
   // If path __ow_path this is being invoked as an action

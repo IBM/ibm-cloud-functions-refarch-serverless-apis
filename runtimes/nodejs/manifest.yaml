@@ -2,7 +2,8 @@
 # GitHub repo is located at https://github.com/IBM/openwhisk-message-hub-trigger
 
 # This manifest file reads the following env. variables:
-#   TBD
+#   CLOUDANT_USERNAME
+#   CLOUDANT_PASSWORD
 
 project:
   name: todos
@@ -32,6 +33,11 @@ packages:
           description: CLOUDANT_PASSWORD
           required: true
           value: $CLOUDANT_PASSWORD
+      base_path:
+          type: string
+          description: The action base path available in __ow_path
+          required: true
+          value: /v1/todo
     actions:
       get_todo:
         function: actions/get
