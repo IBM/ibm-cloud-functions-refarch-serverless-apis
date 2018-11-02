@@ -11,11 +11,11 @@ variable resource_prefix {
 variable provision_appid {}
 variable appid_plan {
   type    = "string"
-  default = "standard"
+  default = "lite"
 }
 variable cloudant_plan {
   type    = "string"
-  default = "Standard"
+  default = "Lite"
 }
 
 data "ibm_space" "spacedata" {
