@@ -23,6 +23,17 @@ fi
 source local.env
 PROVISION_INFRASTRUCTURE=${PROVISION_INFRASTRUCTURE:-true}
 API_USE_APPID=${API_USE_APPID:-false}
+export TF_VAR_ibm_sl_username=$SL_USERNAME
+export TF_VAR_ibm_sl_api_key=$SL_API_KEY
+export TF_VAR_ibm_bx_api_key=$IBMCLOUD_API_KEY
+export TF_VAR_ibm_cf_org=$IBMCLOUD_ORG
+export TF_VAR_ibm_cf_space=$IBMCLOUD_SPACE
+export IBMCLOUD_API_KEY BLUEMIX_REGION
+
+# Login to ibmcloud, generate .wskprops
+ibmcloud login --apikey $IBMCLOUD_API_KEY
+ibmcloud target -o "$IBMCLOUD_ORG" -s "$IBMCLOUD_SPACE"
+ibmcloud fn api list > /dev/null
 
 # Define useful folders
 root_folder=$(cd $(dirname $0); pwd)
@@ -30,7 +41,7 @@ nodejs_folder=${root_folder}/runtimes/nodejs
 actions_folder=${nodejs_folder}/actions
 
 function usage() {
-  echo -e "Usage: $0 [--install,--uninstall,--env] [extra wskdeploy params]"
+  echo -e "Usage: $0 [--install,--uninstall,--env,--demo] [extra wskdeploy params]"
 }
 
 function install() {
@@ -43,7 +54,7 @@ function install() {
   # BM_REGION can be set to select the region. Default is us-south.
   if [[ "$PROVISION_INFRASTRUCTURE" == "true" ]]; then
     export TF_VAR_provision_appid=$([[ "$API_USE_APPID" == "true" ]] && echo 1 || echo 0)
-    pushd infra
+    pushd infra > /dev/null
     terraform init
     terraform apply -auto-approve
     # If terraform was not successful stop here
@@ -85,15 +96,16 @@ function uninstall() {
 
 case "$1" in
 "--install" )
-install
+install $@
 ;;
 "--uninstall" )
-uninstall
+uninstall $@
 ;;
 "--env" )
-env
+env $@
 ;;
 "--demo" )
+shift
 if [[ "$API_USE_APPID" == "true" ]]; then
   # Define a demo user
   DEMO_EMAIL=user@demo.email

@@ -12,22 +12,32 @@ function getDb(params) {
 }
 
 function getDbName(params) {
-  auth_header = params.__ow_headers.authorization
-  if (auth_header) {
-    // The request is authenticated via AppID with a JWT token
-    jwt_token = auth_header.split(' ')[1]
-    b64_payload = jwt_token.split('.')[1]
-    payload = new Buffer(b64_payload, 'base64').toString('ascii')
-    subject = JSON.parse(payload)['sub']
-    console.log("subject:", subject)
-    return "todos_" + subject
-  } else {
-    return "todos"
+  headers = params.__ow_headers
+  if (headers) {
+    auth_header = headers.authorization
+    if (auth_header) {
+      // The request is authenticated via AppID with a JWT token
+      jwt_token = auth_header.split(' ')[1]
+      b64_payload = jwt_token.split('.')[1]
+      payload = new Buffer(b64_payload, 'base64').toString('ascii')
+      subject = JSON.parse(payload)['sub']
+      console.log("subject:", subject)
+      return "todos_" + subject
+    }
   }
+  return "todos"
 }
 
 function getToDoID(params) {
-  return params.__ow_path.replace(/^\/+/g, '')
+  full_path = params.__ow_path
+  base_path = params['base_path']
+  if (full_path) {
+    todo_path = full_path.replace(base_path, '')
+    return todo_path.replace(/^\/+/g, '')
+  }
+  // If path __ow_path this is being invoked as an action
+  // directly. Return an empty ID to emulate a "list"
+  return ''
 }
 
 function asyncToDoGet(todo_db, api_root_url, item) {

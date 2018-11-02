@@ -25,11 +25,10 @@ curl -O $WSK
 chmod u+x wsk
 
 echo "Downloading wskdeploy CLI...\n"
-WSKDEPLOY=https://github.com/apache/incubator-openwhisk-wskdeploy/releases/download/latest/wskdeploy-latest-linux-amd64.tgz
+WSKDEPLOY=https://github.com/apache/incubator-openwhisk-wskdeploy/releases/download/latest/openwhisk_wskdeploy-latest-linux-amd64.tgz
 curl -OL $WSKDEPLOY
-tar xf wskdeploy-latest-linux-amd64.tgz
+tar xf openwhisk_wskdeploy-latest-linux-amd64.tgz
 chmod u+x wskdeploy
-
 
 export PATH=$PATH:`pwd`
 
@@ -40,7 +39,7 @@ echo "Configure local.env..."
 touch local.env # Configurations defined in Travis, this is a no op
 
 echo "Deploying application..."
-wskdeploy ../wskdeploy/manifest.yaml
+# wskdeploy ../wskdeploy/manifest.yaml
 
 echo "Waiting for triggers/actions to finish installing (sleep 5)..."
 sleep 5
@@ -49,13 +48,13 @@ echo "Doing test..."
 
 if [[ true ]]
 then
-	echo "SUCCESS: Found the message we were expecting."
+    echo "SUCCESS: Found the message we were expecting."
     echo "Uninstalling..."
-    wskdeploy undeploy ../wskdeploy/manifest.yaml
+    # wskdeploy undeploy ../wskdeploy/manifest.yaml
     exit 0
 else
-	echo "FAILURE: Something went wrong."
-	echo "Uninstalling..."
-	wskdeploy undeploy ../wskdeploy/manifest.yaml
-	exit -1
+    echo "FAILURE: Something went wrong."
+    echo "Uninstalling..."
+    # wskdeploy undeploy ../wskdeploy/manifest.yaml
+    exit -1
 fi

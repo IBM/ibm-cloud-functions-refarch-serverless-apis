@@ -3,7 +3,11 @@ var common = require('./common/utils.js')
 var content_type_header = {'Content-Type': 'application/json'}
 
 function patchHandler(params) {
-  var api_root_url = params.__ow_headers['x-forwarded-url'];
+  var headers = params.__ow_headers
+  var api_root_url = '<undefined>'
+  if (headers) {
+    var api_root_url = headers['x-forwarded-url'];
+  }
   cloudant = common.getDb(params)
 
   return new Promise(function(resolve, reject) {
@@ -13,6 +17,8 @@ function patchHandler(params) {
       todo_db = cloudant.db.use(todo_db_name)
       // ID is mandatory
       todo_id = common.getToDoID(params)
+      // In case of PATH we need to strip the TODO ID out of the x-forwarded-url
+      api_root_url = api_root_url.replace(todo_id, '')
       if (! todo_id) {
         reject({
           statusCode: 400,
