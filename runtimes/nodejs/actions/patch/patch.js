@@ -17,6 +17,8 @@ function patchHandler(params) {
       todo_db = cloudant.db.use(todo_db_name)
       // ID is mandatory
       todo_id = common.getToDoID(params)
+      // In case of PATH we need to strip the TODO ID out of the x-forwarded-url
+      api_root_url = api_root_url.replace(todo_id, '')
       if (! todo_id) {
         reject({
           statusCode: 400,
