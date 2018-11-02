@@ -1,6 +1,6 @@
 # Serverless REST API with IBM Cloud Functions (powered by Apache OpenWhisk)
 
-[![Build Status](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template.svg?branch=master)](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-template)
+[![Build Status](https://travis.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api.svg?branch=master)](https://travis.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api)
 
 This reference architecture shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from [...]. No code runs until [...] When that happens, application instances are started to match the load needed by each [...] exactly.
 
@@ -13,8 +13,9 @@ If you haven't already, sign up for an IBM Cloud account and go to the [Cloud Fu
 ## Included components
 
 - IBM Cloud Functions (powered by Apache OpenWhisk)
-- Service A (Powered by open source project A)
-- Service B (Powered by open source project B)
+- IMB Cloud Functions API Gateway
+- IBM Cloudant (powered by CouchDB)
+- IBM AppID
 
 The application demonstrates two IBM Cloud Functions (based on Apache OpenWhisk) that [...]. The use case demonstrates how actions work with data services and execute logic in response to [...] events.
 
@@ -22,35 +23,41 @@ One function, or action, is triggered by [...]. These [...] are piped to another
 
 ![Sample Architecture](img/refarch-placeholder.png)
 
-## Deploy through the IBM Cloud Functions console user interface
-
-Choose "[Start Creating](https://console.bluemix.net/openwhisk/create)" and select "Deploy template" then [This template] from the list. A wizard will then take you through configuration and connection to event sources step-by-step.
-
-Behind the scenes, the UI uses `wskdeploy`, which you can also use directly from the CLI by following the steps in the next section.
-
-## Deploy using the `wskdeploy` command line tool
+## Deploy using the `deploy.sh` command line tool
 
 This approach deploy the Cloud Functions with one command driven by the runtime-specific manifest file available in this repository.
 
-- Download the latest `bx` CLI and Cloud Functions plugins and log into the IBM Cloud.
-- Download the latest `wskdeploy` from the [release page](https://github.com/apache/incubator-openwhisk-wskdeploy/releases) of the [openwhisk-wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy) project.
-- Provision a [Service](https://console.ng.bluemix.net/catalog/services/) instance.
-- Copy `template.local.env` to a new file named `local.env` and update the `SERVICE_HOSTNAME`, `SERVICE_USERNAME`, `SERVICE_PASSWORD` and `SERVICE_DATABASE` for your Service instance.
+- Download the latest `ibmcloud` CLI and Cloud Functions plugins
+- Download the latest `wskdeploy` from the [release page](https://github.com/apache/incubator-openwhisk-wskdeploy/releases) of the [openwhisk-wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy)
+project.
+- Copy `template.local.env` to a new file named `local.env` and update
+environment variables to include credentials to your IBM Cloud account.
+- It is possible to use existing service instances for Cloudant DB and AppID.
+To do so set =false and configure the CLOUDANT_USERNAME,
+CLOUDANT_PASSWORD and API_APPID_TENANTID.
+- It is possible to provision Cloudant DB and AppID on the fly automatically
+using terraform. To do so please install the terraform client first and set
+PROVISION_INFRASTRUCTURE=true in your local.env.
+
 
 ### Deployment
 
 ```bash
 # Get a local copy of this repository
-git clone https://github.com/IBM/ibm-cloud-functions-refarch-template.git
-cd ibm-cloud-functions-refarch-template
+git clone https://github.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api
+cd ibm-cloud-functions-rest-api
 
-# Make service credentials available to your environment
-source local.env
-wsk package refresh
+# Prepare a local.env
+cp template.local.env local.env
 
-# Deploy the packages, actions, triggers, and rules using your preferred language
-cd runtimes/nodejs # Or runtimes/[php|python|swift]
-wskdeploy
+# Edit the settings in local.env
+vim local.env
+
+# Run the installer
+./deploy.sh --install
+
+# Test the service
+./deploy.sh --demo
 ```
 
 ### Undeploy
@@ -59,16 +66,6 @@ wskdeploy
 # Deploy the packages, actions, triggers, and rules
 wskdeploy undeploy
 ```
-
-## Alternative deployment methods
-
-### Deploy manually with the `bx wsk` command line tool
-
-[This approach shows you how to deploy individual the packages, actions, triggers, and rules with CLI commands](bx-wsk/README.md). It helps you understand and control the underlying deployment artifacts.
-
-### Deploy with IBM Continuous Delivery
-
-[This approach sets up a continuous delivery pipeline that redeploys on changes to a personal clone of this repository](bx-cd/README.md). It may be of interest to setting up an overall software delivery lifecycle around Cloud Functions.
 
 ## License
 
