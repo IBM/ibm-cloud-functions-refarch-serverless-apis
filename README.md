@@ -2,70 +2,306 @@
 
 [![Build Status](https://travis.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api.svg?branch=master)](https://travis.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api)
 
-This reference architecture shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from [...]. No code runs until [...] When that happens, application instances are started to match the load needed by each [...] exactly.
+This reference architecture shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from a RESP API. No code runs until an API call to and endpoint associated to a function is received by the API GW. When that happens, application instances are started to match the load needed by each API request exactly.
 
 In addition to using cloud resources efficiently, this means that developers can build and deploy applications more quickly. You can learn more about the benefits of building a serverless architecture for this use case in the accompanying [IBM Code Pattern](https://developer.ibm.com/code/technologies/serverless/).
 
-This repository provides a template skeleton for IBM Cloud Functions reference architectures. You can deploy it right away using the [IBM Cloud Functions user interface](#deploy-through-the-ibm-cloud-functions-console-user-interface), or setup and deploy using [command line tools on your own system](#deploy-using-the-wskdeploy-command-line-tool).
+This repository provides a template skeleton for IBM Cloud Functions reference architectures. You can deploy it right away using the [provided deploy script on your own system](#deploy-through-the-deployment-script). Alternatively you can provision
+the required components via the [IBM Cloud user interface](https://console.bluemix.net/)
+and the cloud functions and APIs [using wskdeploy](#deploy-using-wskdeploy) or
+step by step [using CLI commands on your own sytem](#deploy-step-by-step).
 
 If you haven't already, sign up for an IBM Cloud account and go to the [Cloud Functions dashboard](https://console.bluemix.net/openwhisk/) to explore other [reference architecture templates](https://github.com/topics/ibm-cloud-functions-refarch) and download command line tools, if needed.
 
 ## Included components
 
-- IBM Cloud Functions (powered by Apache OpenWhisk)
-- IMB Cloud Functions API Gateway
-- IBM Cloudant (powered by CouchDB)
-- IBM AppID
+* [IBM Cloud Functions](https://console.ng.bluemix.net/openwhisk) (powered by Apache OpenWhisk): Execute code on demand in a highly scalable, serverless environment.
+* [IBM Cloud Functions APIs](https://console.bluemix.net/openwhisk/apimanagement) (powered by Apache OpenWhisk): Define APIs that wrap a set of OpenWhisk actions.
+* [IBM Cloudant](https://console.ng.bluemix.net/catalog/services/cloudant-nosql-db): A fully managed data layer designed for modern web and mobile applications that leverages a flexible JSON schema (powered by CouchDB).
+* [IBM AppID](https://console.bluemix.net/catalog/services/appid): Easily add authentication, secure back ends and APIs, and manage user-specific data for your mobile and web apps.
 
-The application demonstrates two IBM Cloud Functions (based on Apache OpenWhisk) that [...]. The use case demonstrates how actions work with data services and execute logic in response to [...] events.
+## TODO REST API with authentication
 
-One function, or action, is triggered by [...]. These [...] are piped to another action in a sequence (a way to link actions declaratively in a chain). The second action aggregates the [...] and [...].
+The application demonstrates using IBM Cloud Functions (based on Apache OpenWhisk) to build a REST API. The use case demonstrates how actions work with data services and execute logic in response to API requests. It also demonstrates how to secure the content
+behind the API using IBM AppID, by requiring an authentication token to access the API.
+
+The authentication is terminated by the API Gateway, so functions do not need to
+worry about it. Functions receive the JWS token information from the API Gateway
+and can use it to add content authorisation rules. In this pattern authenticated
+users are connected to a dedicated Cloudant DB, so that the TODO list is personal
+and persisted across sessions.
+
+The REST API is a fully compliant implementation of the [TODO Backend API](https://www.todobackend.com/). It can be deployed with or without
+authentication. When authentication is enabled, the API can be consumed via
+the [client webapp](https://www.todobackend.com/client/index.html) and verified
+with the [API tests](https://www.todobackend.com/specs/index.html).
 
 ![Sample Architecture](img/refarch-placeholder.png)
 
-## Deploy using the `deploy.sh` command line tool
 
-This approach deploy the Cloud Functions with one command driven by the runtime-specific manifest file available in this repository.
+## Featured technologies
 
-- Download the latest `ibmcloud` CLI and Cloud Functions plugins
-- Download the latest `wskdeploy` from the [release page](https://github.com/apache/incubator-openwhisk-wskdeploy/releases) of the [openwhisk-wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy)
-project.
-- Copy `template.local.env` to a new file named `local.env` and update
-environment variables to include credentials to your IBM Cloud account.
-- It is possible to use existing service instances for Cloudant DB and AppID.
-To do so set =false and configure the CLOUDANT_USERNAME,
-CLOUDANT_PASSWORD and API_APPID_TENANTID.
-- It is possible to provision Cloudant DB and AppID on the fly automatically
-using terraform. To do so please install the terraform client first and set
-PROVISION_INFRASTRUCTURE=true in your local.env.
+* [Serverless](https://www.ibm.com/cloud-computing/bluemix/openwhisk): An event-action platform that allows you to execute code in response to an event.
+* [Node.js](https://nodejs.org/): An open-source JavaScript run-time environment for executing server-side JavaScript code.
 
+## Prerequisites
+
+### Code and tools
+
+You will need a few tools installed to deploy the patter yourself.
+If you don't want to install them on your local machine and you have docker installed you can use the [IBM cloud tools docker image by JJ Asghar](https://jjasghar.github.io/ibm-docker/) that comes with everything you need preinstalled. Make sure to mount a folder from your local machine where you will clone the code and store your credentials. If using MacOS, you need to make sure that your folder is shared:
+
+![Docker File Sharing](img/docker_file_sharing.png)
+
+
+```
+$ docker run -it -v $PWD:/root/serverless -it jjasghar/ibm-cloud-tools
+
+IBM☁️  #
+```
+
+Alternatively, you can install the required tools on your system. The minimum tools you will need are `git` and `ibmcloud` ([installation instructions](https://console.bluemix.net/docs/cli/reference/ibmcloud/download_cli.html#install_use)).
+Extra tools that are required for specific tasks:
+* [jq](https://stedolan.github.io/jq/download/): required for the post install demo
+* [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy#downloading-released-binaries): required when installing [using wskdeploy](#deploy-using-wskdeploy)
+* [terraform](https://www.terraform.io/downloads.html) and [terraform IBM cloud](https://github.com/IBM-Cloud/terraform-provider-ibm/releases): required when installing using the [provided deploy script](#deploy-through-the-deployment-script)
+
+You can download the code using git:
+
+```
+git clone https://github.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api
+cd ibm-cloud-functions-rest-api
+```
+
+### Account and credentials
+You will need an IBM Cloud account to use this pattern. If you don't have one,
+[sign up for an IBM Cloud account](https://console.bluemix.net/registration/).
+
+IBM Cloud Functions require an `org` and a `space` to be defined for your account. If you don't have them defined already you can follow the [instructions](https://console.bluemix.net/docs/account/orgs_spaces.html#orgsspacesusers) to create them. Alternatively you can use the `ibmcloud` CLI:
+
+```
+$ ibmcloud account org-create ORG_NAME
+$ ibmcloud account space-create SPACE_NAME -o ORG_NAME
+```
+
+IBM Cloud Functions is available in different regions around the world. Select one region geographically close to you, and mark the `Name` from the table below.
+
+```
+Name       Display name    Customer   Deployment   Type
+us-south   Dallas          IBM        Production   public
+eu-de      Frankfurt       IBM        Production   public
+eu-gb      London          IBM        Production   public
+us-east    Washington DC   IBM        Production   public
+```
+
+You will need an API key. You can create one via the [IBM Cloud user interface](https://console.bluemix.net/iam/#/apikeys) or via the `ibmcloud` CLI:
+
+```
+$ ibmcloud iam api-key-create serverless_api \
+  -d "For Serverless API Pattern" \
+  --file serverless_api.apikey
+```
+
+The key will be stored in `serverless_api.apikey`:
+
+```
+$ cat serverless_api.apikey
+{
+	"name": "serverless_api",
+	"description": "For Serverless API Pattern",
+	"apikey": "xxxx_myawsomeapikey_yyyy",
+	"createdAt": "1970-01-01T01:01+0000",
+	"locked": false,
+	"uuid": "ApiKey-111111-aaaa-3333-bbbb-5555555555"
+}
+```
+
+You are now ready to setup your `local.env` file. Make a copy of the `template.local.env` which is in the root directory of the git repo you cloned.
+Edit `local.env` and set `IBMCLOUD_API_KEY`, `IBMCLOUD_ORG`, `IBMCLOUD_SPACE` and `BLUEMIX_REGION` to match the apikey in `serverless_api.apikey` and the org, space and region name that you're using.
+
+```
+# Prepare a local.env
+$ cd ibm-cloud-functions-rest-api
+$ cp template.local.env local.env
+
+# In your favourite editor, set:
+IBMCLOUD_API_KEY=xxxx_myawsomeapikey_yyyy
+IBMCLOUD_ORG=ORG_NAME
+IBMCLOUD_SPACE=ORG_SPACE
+BLUEMIX_REGION=REGION
+```
+
+### To Auth or not to Auth
+
+If you want to enable protecting the REST API with authentication (powered by IBM AppID) edit your `local.env` and set:
+
+```
+API_USE_APPID=true
+```
+
+### Additional infrastructure
+
+This pattern requires an instance of the [IBM Cloudant](https://console.ng.bluemix.net/catalog/services/cloudant-nosql-db) service and (optionally) of the [IBM AppID](https://console.bluemix.net/catalog/services/appid) service.
+Both services are available in the [IBM Cloud catalog](https://console.bluemix.net/catalog/) and can be accessed using the IBM Cloud account previously created.
+
+Both services offer a free service plan, named "lite", which is perfect for deploying and learning about this code pattern.
+
+Only one instance per account of IBM Cloudant and IBM AppID may use the "lite" service plan. If you need to use the payed-for service plan, you can do so by
+appending the following settings to your `local.env`.
+
+*WARNING! You may incur charges when using the payed-for service plan*.
+
+```
+TF_VAR_appid_plan="Graduated tier"
+TF_VAR_cloudant_plan=Standard
+```
+
+#### Infrastructure setup via Terraform
+
+When deploying using the [provided deploy script](#deploy-through-the-deployment-script) it is possible to let Terraform provision and manage Cloudant and AppID for you. To do this you'll need Soft Layer credentials which are required by the [Terraform IBM Cloud Provider](https://ibm-cloud.github.io/tf-ibm-docs/).
+
+Browse to the [SoftLayer control panel](https://control.softlayer.com/), and click on "Log in with IBMid":
+
+![SoftLayer Login](img/sl_login.png)
+
+
+Select "Account", "Users", "User List" from the menu:
+
+![SoftLayer Account Menu](img/account_menu.png)
+
+
+Click on the "generate" link under "API KEY":
+
+![SoftLayer Generate Api Key](img/generate_api_key.png)
+
+
+And finally click on the "view" link under "API KEY". It will prompt a text formatted as follows:
+
+```
+API Key for <softlayer username>
+
+<softlayer api key>
+```
+
+Add the following settings to your `local.env`:
+
+```
+PROVISION_INFRASTRUCTURE=true
+SL_USERNAME=<softlayer username>
+SL_API_KEY=<softlayer api key>
+```
+
+#### Infrastructure setup via IBM Cloud Console
+
+When deploying using the [provided deploy script](#deploy-through-the-deployment-script), as well as with any other deployment method, IBM Cloudand and IBM AppID services can be pre-provisioned using the [IBM Cloud Console](https://console.bluemix.net/).
+
+Provision one instance of the [IBM Cloudant](https://console.ng.bluemix.net/catalog/services/cloudant-nosql-db) service and create service credentials for it, as described in this [guide](https://console.bluemix.net/docs/services/Cloudant/tutorials/create_service.html#creating-an-ibm-cloudant-instance-on-ibm-cloud).
+
+If authentication is enabled, provision one instance of the [IBM AppID](https://console.bluemix.net/catalog/services/appid) service.
+Once provisioned, select "Service Credentials" on the left, and create new credentials, using the "Writer" role:
+
+![AppID Service Credentials](img/appid_service_credentials.png)
+
+
+Add the following settings to your `local.env`, extracted from the service credentials of Cloudant and AppID:
+
+```
+# Cloudant Service Credentials
+CLOUDANT_USERNAME=value
+CLOUDANT_PASSWORD=value
+
+# AppID Service Credentials
+API_APPID_TENANTID=value
+```
+
+## Deploy through the deployment script
+
+This approach deploys the entire code pattern with one script.
+The script invokes `wskdeploy` to deploy IBM Cloud Functions and APIs, and, if requested, it uses `terraform` to provision any required extra infrastructure.
 
 ### Deployment
 
+To use the deployment script cd into the root of the cloned git repo:
+
 ```bash
-# Get a local copy of this repository
-git clone https://github.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api
-cd ibm-cloud-functions-rest-api
-
-# Prepare a local.env
-cp template.local.env local.env
-
-# Edit the settings in local.env
-vim local.env
-
 # Run the installer
 ./deploy.sh --install
+```
 
-# Test the service
+The deployment script outputs the highlights of the deployment process on the console. More details are available in the `deploy.log` log file. A correct output will look like:
+
+```
+Full install output in /git/github.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api/deploy.log
+Logging in to IBM cloud
+Provisioning Terraform managed infrastructure
+Provisioning Functions and APIs
+All done
+
+ok: APIs
+Action                              Verb  API Name  URL
+/namespace/todo_package/get_todo    get      todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
+/namespace/todo_package/post_todo   post     todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
+/namespace/todo_package/delete_todo delete   todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
+/namespace/todo_package/patch_todo  patch    todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
+```
+
+### Verification
+
+Once the service is deployed, it can be verified using the deploy script in demo mode:
+
+```bash
+# Run the installer
 ./deploy.sh --demo
+```
+
+A successful output will look like:
+
+```
+Logging in to IBM cloud
+Provision a user in the cloud directory
+Get a token from the demo user
+Post a TODO
+{
+  "title": "Run the demo",
+  "completed": false,
+  "url": "https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/04d2277efeddec1b637ad6a3c54a02443919a94cf3c577f6599144789379b0cd/v1/todo/0e6a11c0223ca15940f37795deefc829"
+}
+Post a TODO
+{
+  "title": "Like this pattern",
+  "completed": false,
+  "url": "https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/04d2277efeddec1b637ad6a3c54a02443919a94cf3c577f6599144789379b0cd/v1/todo/ff3e0a79b8d2f1ad4d1e95e7f318ccce"
+}
+List all TODOs
+[
+  {
+    "title": "Run the demo",
+    "completed": false,
+    "url": "https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/04d2277efeddec1b637ad6a3c54a02443919a94cf3c577f6599144789379b0cd/v1/todo//0e6a11c0223ca15940f37795deefc829"
+  },
+  {
+    "title": "Like this pattern",
+    "completed": false,
+    "url": "https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/04d2277efeddec1b637ad6a3c54a02443919a94cf3c577f6599144789379b0cd/v1/todo//ff3e0a79b8d2f1ad4d1e95e7f318ccce"
+  }
+]
+Delete all TODOs
+{}
 ```
 
 ### Undeploy
 
 ```bash
-# Deploy the packages, actions, triggers, and rules
-wskdeploy undeploy
+./deploy.sh --uninstall
 ```
+
+## Deploy Using `wskdeploy`
+
+TBD
+
+## Deploy Step by Step
+
+TBD
 
 ## License
 

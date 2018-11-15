@@ -15,33 +15,55 @@
 # limitations under the License.
 ##############################################################################
 
-# Load configuration variables
-if [ ! -f local.env ]; then
-  echo "Before deploying, copy template.local.env into local.env and fill in environment specific values."
-  exit 1
-fi
-source local.env
-PROVISION_INFRASTRUCTURE=${PROVISION_INFRASTRUCTURE:-true}
-API_USE_APPID=${API_USE_APPID:-false}
-export TF_VAR_ibm_sl_username=$SL_USERNAME
-export TF_VAR_ibm_sl_api_key=$SL_API_KEY
-export TF_VAR_ibm_bx_api_key=$IBMCLOUD_API_KEY
-export TF_VAR_ibm_cf_org=$IBMCLOUD_ORG
-export TF_VAR_ibm_cf_space=$IBMCLOUD_SPACE
-export IBMCLOUD_API_KEY BLUEMIX_REGION
+# Fail on undefined variables
+set -u
 
-# Login to ibmcloud, generate .wskprops
-ibmcloud login --apikey $IBMCLOUD_API_KEY
-ibmcloud target -o "$IBMCLOUD_ORG" -s "$IBMCLOUD_SPACE"
-ibmcloud fn api list > /dev/null
+# Fail on failing commands
+set -e
 
 # Define useful folders
 root_folder=$(cd $(dirname $0); pwd)
 nodejs_folder=${root_folder}/runtimes/nodejs
 actions_folder=${nodejs_folder}/actions
 
+# SETUP logging (redirect stdout and stderr to a log file)
+readonly LOG_FILE="${root_folder}/deploy.log"
+touch $LOG_FILE
+exec 3>&1 # Save stdout
+exec 4>&2 # Save stderr
+exec 1>$LOG_FILE 2>&1
+
+function _out() {
+  echo "$@" >&3
+  echo "$(date +"%F %H:%M:%S) $@"
+}
+
+function _err() {
+  echo "$@" >&4
+  echo "$(date +"%F %H:%M:%S) $@"
+}
+
+function ibmcloud_login() {
+  # Skip version check updates
+  ibmcloud config --check-version=false
+
+  # Obtain the API endpoint from BLUEMIX_REGION and set it as default
+  _out Logging in to IBM cloud
+  ibmcloud api --unset
+  IBMCLOUD_API_ENDPOINT=$(ibmcloud api | awk '/'$BLUEMIX_REGION'/{ print $2 }')
+  ibmcloud api $IBMCLOUD_API_ENDPOINT
+
+  # Login to ibmcloud, generate .wskprops
+  ibmcloud login --apikey $IBMCLOUD_API_KEY -a $IBMCLOUD_API_ENDPOINT
+  ibmcloud target -o "$IBMCLOUD_ORG" -s "$IBMCLOUD_SPACE"
+  ibmcloud fn api list > /dev/null
+
+  # Show the result of login to stdout
+  ibmcloud target
+}
+
 function usage() {
-  echo -e "Usage: $0 [--install,--uninstall,--env,--demo] [extra wskdeploy params]"
+  _err -e "Usage: $0 [--install,--uninstall,--env,--demo] [extra wskdeploy params]"
 }
 
 function install() {
@@ -53,6 +75,7 @@ function install() {
   # TF_VAR_ibm_cf_org, TF_VAR_ibm_cf_space must be set
   # BM_REGION can be set to select the region. Default is us-south.
   if [[ "$PROVISION_INFRASTRUCTURE" == "true" ]]; then
+    _out Provisioning Terraform managed infrastructure
     export TF_VAR_provision_appid=$([[ "$API_USE_APPID" == "true" ]] && echo 1 || echo 0)
     pushd infra > /dev/null
     terraform init
@@ -67,10 +90,10 @@ function install() {
     popd
   fi
   export CLOUDANT_USERNAME CLOUDANT_PASSWORD API_APPID_TENANTID
-  shift
   # NOTE: This provisions the Actions/APIs in the region/namespace
   # configured in ~/.wskprops by default. It can be overwritten by passing
   # wskdeploy params to the deploy script
+  _out Provisioning Functions and APIs
   wskdeploy -p ${nodejs_folder}/ $@
   # If AppID is enabled update the API definition to include the AppID tenant
   if [ "$API_USE_APPID" == "true" ]; then
@@ -81,31 +104,61 @@ function install() {
     ibmcloud fn api create -c ${root_folder}/appid/_api_definition.json
     rm ${root_folder}/appid/_api_definition.json
   fi
+  _out All done.
+  ibmcloud fn api list todos >&3
 }
 
 function uninstall() {
   if [[ "$PROVISION_INFRASTRUCTURE" == "true" ]]; then
     export TF_VAR_provision_appid=$([[ "$API_USE_APPID" == "true" ]] && echo 1 || echo 0)
     pushd infra
+    _out "Uninstall terraform managed infrastructure"
     terraform destroy -auto-approve
     popd
   fi
-  shift
+  _out "Uninstall Functions and APIs"
   wskdeploy undeploy -p ${nodejs_folder}/ $@
 }
 
+# Main script starts here
+# Load configuration variables
+if [ ! -f local.env ]; then
+  _err "Before deploying, copy template.local.env into local.env and fill in environment specific values."
+  exit 1
+fi
+source local.env
+PROVISION_INFRASTRUCTURE=${PROVISION_INFRASTRUCTURE:-true}
+API_USE_APPID=${API_USE_APPID:-false}
+export TF_VAR_ibm_sl_username=$SL_USERNAME
+export TF_VAR_ibm_sl_api_key=$SL_API_KEY
+export TF_VAR_ibm_bx_api_key=$IBMCLOUD_API_KEY
+export TF_VAR_ibm_cf_org=$IBMCLOUD_ORG
+export TF_VAR_ibm_cf_space=$IBMCLOUD_SPACE
+export IBMCLOUD_API_KEY BLUEMIX_REGION
+export TF_VAR_appid_plan=${IBMCLOUD_APPID_PLAN:-"lite"}
+export TF_VAR_cloudant_plan=${IBMCLOUD_CLOUDANT_PLAN:-"Lite"}
+
 case "$1" in
 "--install" )
+shift
+_out Full install output in $LOG_FILE
+ibmcloud_login
 install $@
 ;;
 "--uninstall" )
+shift
+_out Full uninstall output in $LOG_FILE
+ibmcloud_login
 uninstall $@
 ;;
 "--env" )
-env $@
+shift
+_err "==> Output of \"env\" command:"
+env $@ 4>&3 >&3
 ;;
 "--demo" )
 shift
+ibmcloud_login
 if [[ "$API_USE_APPID" == "true" ]]; then
   # Define a demo user
   DEMO_EMAIL=user@demo.email
@@ -120,6 +173,7 @@ if [[ "$API_USE_APPID" == "true" ]]; then
   APPID_SECRET=$(terraform output appid_credentials | awk '/secret/{ gsub(/,$/, ""); print $3 }')
   popd > /dev/null
   # Provision a user in the cloud directory
+  _out Provision a user in the cloud directory
   curl -s -X POST \
     --header 'Content-Type: application/json' \
     --header 'Accept: application/json' \
@@ -132,6 +186,7 @@ if [[ "$API_USE_APPID" == "true" ]]; then
         }' \
     "${APPID_MGMTURL}/cloud_directory/Users" | jq .
   # Get a token for the demo user
+  _out Get a token from the demo user
   DEMO_BEARER_TOKEN=$(curl -s -X POST -u $APPID_CLIENTID:$APPID_SECRET \
     --header 'Content-Type: application/x-www-form-urlencoded' \
     --header 'Accept: application/json' \
@@ -152,26 +207,26 @@ else
   AUTH_HEADER_2=""
 fi
 # POST a couple of TODOs
-echo "Post a TODO"
+_out "Post a TODO"
 curl -s -X POST $AUTH_HEADER_1 "$AUTH_HEADER_2" \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
   -d '{"title": "Run the demo"}' \
-  "$POST_URL" | jq .
-echo "Post a TODO"
+  "$POST_URL" | jq . >&3
+_out "Post a TODO"
 curl -s -X POST $AUTH_HEADER_1 "$AUTH_HEADER_2" \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
   -d '{"title": "Like this pattern"}' \
-  "$POST_URL" | jq .
+  "$POST_URL" | jq . >&3
 # And fetch them
-echo "List all TODOs"
+_out "List all TODOs"
 curl -s -X GET $AUTH_HEADER_1 "$AUTH_HEADER_2" \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
-  "${GET_URL}/" | jq .
+  "${GET_URL}/" | jq . >&3
 # Cleanup
-echo "Delete all TODOs"
+_out "Delete all TODOs"
 for todo_url in $(curl -s -X GET $AUTH_HEADER_1 "$AUTH_HEADER_2" \
                     --header 'Content-Type: application/json' \
                     --header 'Accept: application/json' \
@@ -179,7 +234,7 @@ for todo_url in $(curl -s -X GET $AUTH_HEADER_1 "$AUTH_HEADER_2" \
   curl -s -X DELETE $AUTH_HEADER_1 "$AUTH_HEADER_2" \
     --header 'Content-Type: application/json' \
     --header 'Accept: application/json' \
-    "${todo_url}" | jq .
+    "${todo_url}" | jq . >&3
 done
 ;;
 * )
