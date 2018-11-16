@@ -264,25 +264,25 @@ Post a TODO
 {
   "title": "Run the demo",
   "completed": false,
-  "url": "https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/04d2277efeddec1b637ad6a3c54a02443919a94cf3c577f6599144789379b0cd/v1/todo/0e6a11c0223ca15940f37795deefc829"
+  "url": "https://<endpoint>/gws/apigateway/api/<id>/v1/todo/0e6a11c0223ca15940f37795deefc829"
 }
 Post a TODO
 {
   "title": "Like this pattern",
   "completed": false,
-  "url": "https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/04d2277efeddec1b637ad6a3c54a02443919a94cf3c577f6599144789379b0cd/v1/todo/ff3e0a79b8d2f1ad4d1e95e7f318ccce"
+  "url": "https://<endpoint>/gws/apigateway/api/<id>/v1/todo/ff3e0a79b8d2f1ad4d1e95e7f318ccce"
 }
 List all TODOs
 [
   {
     "title": "Run the demo",
     "completed": false,
-    "url": "https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/04d2277efeddec1b637ad6a3c54a02443919a94cf3c577f6599144789379b0cd/v1/todo//0e6a11c0223ca15940f37795deefc829"
+    "url": "https://<endpoint>/gws/apigateway/api/<id>/v1/todo//0e6a11c0223ca15940f37795deefc829"
   },
   {
     "title": "Like this pattern",
     "completed": false,
-    "url": "https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/04d2277efeddec1b637ad6a3c54a02443919a94cf3c577f6599144789379b0cd/v1/todo//ff3e0a79b8d2f1ad4d1e95e7f318ccce"
+    "url": "https://<endpoint>/gws/apigateway/api/<id>/v1/todo//ff3e0a79b8d2f1ad4d1e95e7f318ccce"
   }
 ]
 Delete all TODOs
@@ -297,7 +297,75 @@ Delete all TODOs
 
 ## Deploy Using `wskdeploy`
 
-TBD
+This approach deploys functions and APIs to the IBM Cloud Functions service using `wskdeploy`. Before you can do this, follow the steps in [Infrastructure setup via IBM Cloud Console](#infrastructure-setup-via-ibm-cloud-console).
+
+The script invokes `wskdeploy` to deploy IBM Cloud Functions and APIs, and, if requested, it uses `terraform` to provision any required extra infrastructure.
+
+### Deployment
+
+To use the deployment approach cd into the root of the cloned git repo and run wskdeploy.
+
+```bash
+# Run wskdeploy
+wskdeploy -p ./runtimes/nodejs
+```
+The output will look something like:
+
+```
+Info: The API host is [openwhisk.ng.bluemix.net], from .wskprops.
+Info: The auth key is set, from .wskprops.
+Info: The namespace is [_], from .wskprops.
+Info: The apigw access token is set, from .wskprops.
+Info: Unmarshal OpenWhisk runtimes from internet at https://openwhisk.ng.bluemix.net.
+Info: Deploying package [todo_package] ...
+Info: package [todo_package] has been successfully deployed.
+
+Info: Deploying action [todo_package/get_todo] ...
+Info: action [todo_package/get_todo] has been successfully deployed.
+
+Info: Deploying action [todo_package/delete_todo] ...
+Info: action [todo_package/delete_todo] has been successfully deployed.
+
+Info: Deploying action [todo_package/post_todo] ...
+Info: action [todo_package/post_todo] has been successfully deployed.
+
+Info: Deploying action [todo_package/patch_todo] ...
+Info: action [todo_package/patch_todo] has been successfully deployed.
+
+Info: Deploying api [todos /v1/todo PATCH] ...
+Info: api [todos /v1/todo PATCH] has been successfully deployed.
+
+Info: Deploying api [todos /v1/todo GET] ...
+Info: api [todos /v1/todo GET] has been successfully deployed.
+
+Info: Deploying api [todos /v1/todo DELETE] ...
+Info: api [todos /v1/todo DELETE] has been successfully deployed.
+
+Info: Deploying api [todos /v1/todo POST] ...
+Info: api [todos /v1/todo POST] has been successfully deployed.
+```
+
+When using IBM AppID, the tenant_id from the AppID service credentials must be configured in the API definition. To do that run the following commands from the root of the folder where you cloned the git repo:
+
+```bash
+$ ibmcloud fn api get todos --format json | \
+    python ./appid/api_def_add_auth.py $API_APPID_TENANTID \
+    > ./appid/_api_definition.json
+$  ibmcloud fn api create -c ./appid/_api_definition.json
+```
+
+The output will look like:
+
+```
+ok: created API /v1/todo get for action /namespace/todo_package/get_todo
+https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+ok: created API /v1/todo post for action /namespace/todo_package/post_todo
+https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+ok: created API /v1/todo delete for action /namespace/todo_package/delete_todo
+https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+ok: created API /v1/todo patch for action /namespace/todo_package/patch_todo
+https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+```
 
 ## Deploy Step by Step
 
