@@ -369,6 +369,10 @@ ok: created API /v1/todo patch for action /ORG_NAME_ORG_SPACE/todo_package/patch
 https://<endpoint>/gws/apigateway/api/<id>/v1/todo
 ```
 
+### Verification
+
+See [verification](#verification-with-curl).
+
 ### Undeployment
 
 To use this undeployment approach change directory to the root of the cloned git repo and run wskdeploy.
@@ -493,6 +497,110 @@ ok: created API /v1/todo delete for action /ORG_NAME_ORG_SPACE/todo_package/dele
 https://<endpoint>/gws/apigateway/api/<id>/v1/todo
 ok: created API /v1/todo patch for action /ORG_NAME_ORG_SPACE/todo_package/patch_todo
 https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+```
+
+### Verification with cURL
+
+If AppID was not enabled, you can verify the correct deployment via the [client webapp](https://www.todobackend.com/client/index.html) or via the [tests](https://www.todobackend.com/specs/index.html) and pasting in the URL of the API `https://<endpoint>/gws/apigateway/api/<id>/v1/todo`.
+
+If AppID is enabled, you will need to provision a user, obtain a token and use cURL to use your API. The first step is to setup a few environment variables. The values for these are in the service credentials provisioned earlier on the AppID service:
+
+```
+APPID_TENANTID
+APPID_CLIENTID
+APPID_OAUTHURL
+APPID_MGMTURL
+APPID_SECRET
+```
+
+You'll need an IBM cloud token as well:
+
+```bash
+IBMCLOUD_BEARER_TOKEN=$(ibmcloud iam oauth-tokens | awk '/IAM/{ print $3" "$4 }')
+```
+
+#### Provision a demo user
+
+```bash
+DEMO_EMAIL=user@demo.email
+DEMO_PASSWORD=verysecret
+curl -s -X POST \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  --header "Authorization: $IBMCLOUD_BEARER_TOKEN" \
+  -d '{"emails": [
+          {"value": "'$DEMO_EMAIL'","primary": true}
+        ],
+       "userName": "'$DEMO_EMAIL'",
+       "password": "'$DEMO_PASSWORD'"
+      }' \
+  "${APPID_MGMTURL}/cloud_directory/Users" | jq .
+```
+
+Expected result:
+
+```
+{
+  "emails": [
+    {
+      "value": "user@demo.email",
+      "primary": true
+    }
+  ],
+  "displayName": "user@demo.email",
+  "meta": {
+    "created": "2018-11-19T15:27:10.471Z",
+    "location": "/v1/6fbece0f-dd16-4e69-afb9-b431cb594c18/Users/86d06a5e-f37a-4dee-ae95-066cd6e6126e",
+    "lastModified": "2018-11-19T15:27:10.471Z",
+    "resourceType": "User"
+  },
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User"
+  ],
+  "id": "86d06a5e-f37a-4dee-ae95-066cd6e6126e",
+  "userName": "user@demo.email"
+}
+```
+
+#### Obtain a token
+
+```
+DEMO_BEARER_TOKEN=$(curl -s -X POST -u $APPID_CLIENTID:$APPID_SECRET \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --header 'Accept: application/json' \
+  -d 'grant_type=password&username='$DEMO_EMAIL'&password='$DEMO_PASSWORD \
+  "${APPID_OAUTHURL}/token" | jq -r .id_token)
+```
+
+#### Use the API
+
+Create a TODO (http POST):
+
+```
+curl -s -X POST --header "Authorization: Bearer $DEMO_BEARER_TOKEN" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  -d '{"title": "Run the demo"}' \
+  "$POST_URL" | jq .
+```
+
+List all TODOs (http GET):
+
+```
+curl -s -X GET --header "Authorization: Bearer $DEMO_BEARER_TOKEN" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  "${GET_URL}/" | jq .
+```
+
+Delete a TODO (http DELETE):
+
+```
+TODO_URL=<url of a todo from the create / list calls>
+curl -s -X DELETE --header "Authorization: Bearer $DEMO_BEARER_TOKEN" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  "${TODO_URL}/" | jq .
 ```
 
 ### Undeployment

@@ -35,12 +35,12 @@ exec 1>$LOG_FILE 2>&1
 
 function _out() {
   echo "$@" >&3
-  echo "$(date +"%F %H:%M:%S) $@"
+  echo "$(date +'%F %H:%M:%S') $@"
 }
 
 function _err() {
   echo "$@" >&4
-  echo "$(date +"%F %H:%M:%S) $@"
+  echo "$(date +'%F %H:%M:%S') $@"
 }
 
 function ibmcloud_login() {
