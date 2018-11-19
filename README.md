@@ -55,7 +55,7 @@ If you don't want to install them on your local machine and you have docker inst
 
 
 ```
-$ docker run -it -v $PWD:/root/serverless -it jjasghar/ibm-cloud-tools
+docker run -it -v $PWD:/root/serverless -it jjasghar/ibm-cloud-tools
 
 IBM☁️  #
 ```
@@ -80,8 +80,8 @@ You will need an IBM Cloud account to use this pattern. If you don't have one,
 IBM Cloud Functions require an `org` and a `space` to be defined for your account. If you don't have them defined already you can follow the [instructions](https://console.bluemix.net/docs/account/orgs_spaces.html#orgsspacesusers) to create them. Alternatively you can use the `ibmcloud` CLI:
 
 ```
-$ ibmcloud account org-create ORG_NAME
-$ ibmcloud account space-create SPACE_NAME -o ORG_NAME
+ibmcloud account org-create ORG_NAME
+ibmcloud account space-create SPACE_NAME -o ORG_NAME
 ```
 
 IBM Cloud Functions is available in different regions around the world. Select one region geographically close to you, and mark the `Name` from the table below.
@@ -97,7 +97,7 @@ us-east    Washington DC   IBM        Production   public
 You will need an API key. You can create one via the [IBM Cloud user interface](https://console.bluemix.net/iam/#/apikeys) or via the `ibmcloud` CLI:
 
 ```
-$ ibmcloud iam api-key-create serverless_api \
+ibmcloud iam api-key-create serverless_api \
   -d "For Serverless API Pattern" \
   --file serverless_api.apikey
 ```
@@ -105,7 +105,7 @@ $ ibmcloud iam api-key-create serverless_api \
 The key will be stored in `serverless_api.apikey`:
 
 ```
-$ cat serverless_api.apikey
+cat serverless_api.apikey
 {
 	"name": "serverless_api",
 	"description": "For Serverless API Pattern",
@@ -121,8 +121,8 @@ Edit `local.env` and set `IBMCLOUD_API_KEY`, `IBMCLOUD_ORG`, `IBMCLOUD_SPACE` an
 
 ```
 # Prepare a local.env
-$ cd ibm-cloud-functions-rest-api
-$ cp template.local.env local.env
+cd ibm-cloud-functions-rest-api
+cp template.local.env local.env
 
 # In your favourite editor, set:
 IBMCLOUD_API_KEY=xxxx_myawsomeapikey_yyyy
@@ -221,7 +221,7 @@ The script invokes `wskdeploy` to deploy IBM Cloud Functions and APIs, and, if r
 
 ### Deployment
 
-To use the deployment script cd into the root of the cloned git repo:
+To use the deployment script change directory to the root of the cloned git repo:
 
 ```bash
 # Run the installer
@@ -239,10 +239,10 @@ All done
 
 ok: APIs
 Action                              Verb  API Name  URL
-/namespace/todo_package/get_todo    get      todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
-/namespace/todo_package/post_todo   post     todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
-/namespace/todo_package/delete_todo delete   todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
-/namespace/todo_package/patch_todo  patch    todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
+/ORG_NAME_ORG_SPACE/todo_package/get_todo    get      todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
+/ORG_NAME_ORG_SPACE/todo_package/post_todo   post     todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
+/ORG_NAME_ORG_SPACE/todo_package/delete_todo delete   todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
+/ORG_NAME_ORG_SPACE/todo_package/patch_todo  patch    todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
 ```
 
 ### Verification
@@ -289,7 +289,7 @@ Delete all TODOs
 {}
 ```
 
-### Undeploy
+### Undeployment
 
 ```bash
 ./deploy.sh --uninstall
@@ -303,10 +303,11 @@ The script invokes `wskdeploy` to deploy IBM Cloud Functions and APIs, and, if r
 
 ### Deployment
 
-To use the deployment approach cd into the root of the cloned git repo and run wskdeploy.
+To use this deployment approach change directory to the root of the cloned git repo and run wskdeploy.
 
 ```bash
 # Run wskdeploy
+. local.env
 wskdeploy -p ./runtimes/nodejs
 ```
 The output will look something like:
@@ -348,28 +349,163 @@ Info: api [todos /v1/todo POST] has been successfully deployed.
 When using IBM AppID, the tenant_id from the AppID service credentials must be configured in the API definition. To do that run the following commands from the root of the folder where you cloned the git repo:
 
 ```bash
-$ ibmcloud fn api get todos --format json | \
+. local.env
+ibmcloud fn api get todos --format json | \
     python ./appid/api_def_add_auth.py $API_APPID_TENANTID \
     > ./appid/_api_definition.json
-$  ibmcloud fn api create -c ./appid/_api_definition.json
+ ibmcloud fn api create -c ./appid/_api_definition.json
 ```
 
 The output will look like:
 
 ```
-ok: created API /v1/todo get for action /namespace/todo_package/get_todo
+ok: created API /v1/todo get for action /ORG_NAME_ORG_SPACE/todo_package/get_todo
 https://<endpoint>/gws/apigateway/api/<id>/v1/todo
-ok: created API /v1/todo post for action /namespace/todo_package/post_todo
+ok: created API /v1/todo post for action /ORG_NAME_ORG_SPACE/todo_package/post_todo
 https://<endpoint>/gws/apigateway/api/<id>/v1/todo
-ok: created API /v1/todo delete for action /namespace/todo_package/delete_todo
+ok: created API /v1/todo delete for action /ORG_NAME_ORG_SPACE/todo_package/delete_todo
 https://<endpoint>/gws/apigateway/api/<id>/v1/todo
-ok: created API /v1/todo patch for action /namespace/todo_package/patch_todo
+ok: created API /v1/todo patch for action /ORG_NAME_ORG_SPACE/todo_package/patch_todo
 https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+```
+
+### Undeployment
+
+To use this undeployment approach change directory to the root of the cloned git repo and run wskdeploy.
+
+```bash
+# Run wskdeploy
+. local.env
+wskdeploy undeploy -p ./runtimes/nodejs
 ```
 
 ## Deploy Step by Step
 
-TBD
+To use this deployment approach change directory to the root of the cloned git repo and create all functions and API, one by one, by using `ibmcloud fn`.
+
+### Deployment
+
+Setup the environment:
+
+```bash
+. local.env
+cd runtimes/nodejs/actions
+```
+
+Create the package:
+
+```bash
+ibmcloud fn package create todo_package \
+    --param username $CLOUDANT_USERNAME \
+    --param password $CLOUDANT_PASSWORD \
+    --param base_path /v1/todo
+```
+
+Which results in:
+```
+ok: created package todo_package
+```
+
+Create the get action:
+
+```bash
+TODO_ACTION=get
+pushd $TODO_ACTION
+zip ../${TODO_ACTION}.zip *
+popd
+zip ${TODO_ACTION}.zip common/utils.js
+ibmcloud fn action create todo_package/${TODO_ACTION}_todo \
+  --kind nodejs:8 \
+  --web true \
+  ${TODO_ACTION}.zip
+```
+
+Which results in:
+```
+ok: created action todo_package/get_todo
+```
+
+Repeat the step above three more times the other action by setting TODO_ACTION to different values:
+
+```bash
+TODO_ACTION=post
+TODO_ACTION=patch
+TODO_ACTION=delete
+```
+
+Once all actions have been created you may verify your work by:
+
+```bash
+ibmcloud fn action list todo_package
+```
+
+Which should return:
+```
+actions
+/ORG_NAME_ORG_SPACE/todo_package/get_todo           private nodejs:8
+/ORG_NAME_ORG_SPACE/todo_package/patch_todo         private nodejs:8
+/ORG_NAME_ORG_SPACE/todo_package/post_todo          private nodejs:8
+/ORG_NAME_ORG_SPACE/todo_package/delete_todo        private nodejs:8
+```
+
+Create the API for the GET method:
+
+```bash
+TODO_ACTION=get
+ibmcloud fn api create /v1 /todo $TODO_ACTION \
+  /ORG_NAME_ORG_SPACE/todo_package/${TODO_ACTION}_todo \
+  --response-type http \
+  -n todos
+```
+
+Which results in:
+```
+ok: created API /v1/todo GET for action /ORG_NAME_ORG_SPACE/todo_package/get_todo
+https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+```
+
+Repeat the step above three more times the other APIs by setting TODO_ACTION to different values:
+
+```bash
+TODO_ACTION=post
+TODO_ACTION=patch
+TODO_ACTION=delete
+```
+
+When using IBM AppID, the tenant_id from the AppID service credentials must be configured in the API definition. To do that run the following commands from the root of the folder where you cloned the git repo:
+
+```bash
+. local.env
+ibmcloud fn api get todos --format json | \
+    python ./appid/api_def_add_auth.py $API_APPID_TENANTID \
+    > ./appid/_api_definition.json
+ ibmcloud fn api create -c ./appid/_api_definition.json
+```
+
+The output will look like:
+
+```
+ok: created API /v1/todo get for action /ORG_NAME_ORG_SPACE/todo_package/get_todo
+https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+ok: created API /v1/todo post for action /ORG_NAME_ORG_SPACE/todo_package/post_todo
+https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+ok: created API /v1/todo delete for action /ORG_NAME_ORG_SPACE/todo_package/delete_todo
+https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+ok: created API /v1/todo patch for action /ORG_NAME_ORG_SPACE/todo_package/patch_todo
+https://<endpoint>/gws/apigateway/api/<id>/v1/todo
+```
+
+### Undeployment
+
+To use this deployment approach delete all functions and API:
+
+```bash
+ibmcloud fn api delete todos
+ibmcloud fn action delete /ORG_NAME_ORG_SPACE/todo_package/get_todo
+ibmcloud fn action delete /ORG_NAME_ORG_SPACE/todo_package/post_todo
+ibmcloud fn action delete /ORG_NAME_ORG_SPACE/todo_package/patch_todo
+ibmcloud fn action delete /ORG_NAME_ORG_SPACE/todo_package/delete_todo
+```
 
 ## License
 
