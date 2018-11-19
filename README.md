@@ -36,8 +36,15 @@ authentication. When authentication is enabled, the API can be consumed via
 the [client webapp](https://www.todobackend.com/client/index.html) and verified
 with the [API tests](https://www.todobackend.com/specs/index.html).
 
-![Sample Architecture](img/refarch-placeholder.png)
+![Sample Architecture](img/rest_api_flow.jpg)
 
+1. The user obtains a token from IBM AppID Auth Server. AppID verifies the user credentials against the Cloud Directory. AppID may also be configured to use different [authentication providers](https://console.bluemix.net/docs/services/appid/manageidp.html#managing).
+2. IBM AppID Auth Server returns a JWS token to the user.
+3. The user issues an API request (HTTP GET) to the IBM Cloud Functions API Gateway to access the protected resource, including the JWS token.
+4. The IBM Cloud Functions API Gateway validates the token through IBM AppID.
+5. IBM AppID validates the token.
+6. The IBM Cloud Functions API Gateway invokes the function `todo_get` associated to the API endpoint and HTTP method.
+7. The function uses the JWS token to learn about the user requesting the resource and to select the content in the IBM Cloudant NoSQL Database that the user is authorized to access. The function also builds the HTTP response and its JSON body with the requested 'TODO'.
 
 ## Featured technologies
 
