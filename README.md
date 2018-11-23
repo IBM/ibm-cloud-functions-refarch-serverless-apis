@@ -136,42 +136,7 @@ Both services are available in the [IBM Cloud catalog](https://console.bluemix.n
 
 Both services offer a free service plan, named "lite", which is perfect for deploying and learning about this code pattern.
 
-These two services are installed automatically via Terraform as part of the deployment process. You'll need Soft Layer credentials which are required by the [Terraform IBM Cloud Provider](https://ibm-cloud.github.io/tf-ibm-docs/).
-
-Browse to the [SoftLayer control panel](https://control.softlayer.com/), and click on "Log in with IBMid":
-
-<p align="center">
-  <img width="30%" src="img/sl_login.png" alt="SoftLayer Login">
-</p>
-
-Select "Account", "Users", "User List" from the menu:
-
-<p align="center">
-  <img width="30%" src="img/account_menu.png" alt="SoftLayer Account Menu">
-</p>
-
-Click on the "generate" link under "API KEY":
-
-<p align="center">
-  <img width="30%" src="img/generate_api_key.png" alt="SoftLayer Generate Api Key">
-</p>
-
-And finally click on the "view" link under "API KEY". It will prompt a text formatted as follows:
-
-```
-API Key for <softlayer username>
-
-<softlayer api key>
-```
-
-Add the following settings to your `local.env`:
-
-```
-PROVISION_INFRASTRUCTURE=true
-SL_USERNAME=<softlayer username>
-SL_API_KEY=<softlayer api key>
-```
-
+These two services are installed automatically via Terraform as part of the deployment process. 
 Only one instance per account of IBM Cloudant and IBM AppID may use the "lite" service plan. If you need to use the payed-for service plan, you can do so by appending the following settings to your `local.env`.
 
 *WARNING! You may incur charges when using the payed-for service plan*.
