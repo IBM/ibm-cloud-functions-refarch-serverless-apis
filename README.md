@@ -28,7 +28,7 @@ It demonstrates using IBM Cloud Functions (based on Apache OpenWhisk) to build a
 The authentication is terminated by the API Gateway, so functions do not need to worry about it. Functions receive the JWS token information from the API Gateway and can use it to add content authorisation rules. In this pattern authenticated users are connected to a dedicated Cloudant DB, so that the TODO list is personal
 and persisted across sessions.
 
-![Sample Architecture](img/rest_api_flow.jpg)
+![Sample Architecture](img/rest_api_flow.png)
 
 1. The user obtains a token from IBM AppID Auth Server. AppID verifies the user credentials against the Cloud Directory. AppID may also be configured to use different [authentication providers](https://console.bluemix.net/docs/services/appid/manageidp.html#managing).
 2. IBM AppID Auth Server returns a JWS token to the user.
