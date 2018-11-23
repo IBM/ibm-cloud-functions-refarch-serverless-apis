@@ -136,7 +136,7 @@ Both services are available in the [IBM Cloud catalog](https://console.bluemix.n
 
 Both services offer a free service plan, named "lite", which is perfect for deploying and learning about this code pattern.
 
-These two services are installed automatically via Terraform as part of the deployment process. 
+These two services are installed automatically via Terraform as part of the deployment process.
 Only one instance per account of IBM Cloudant and IBM AppID may use the "lite" service plan. If you need to use the payed-for service plan, you can do so by appending the following settings to your `local.env`.
 
 *WARNING! You may incur charges when using the payed-for service plan*.
@@ -177,7 +177,7 @@ Action                              Verb  API Name  URL
 /ORG_NAME_ORG_SPACE/todo_package/patch_todo  patch    todos  https://<base_endpoint>/gws/apigateway/api/<id>/v1/todo
 ```
 
-### Verification
+### Automated Verification
 
 Once the service is deployed, it can be verified using the deploy script in demo mode:
 
@@ -219,6 +219,119 @@ List all TODOs
 ]
 Delete all TODOs
 {}
+```
+
+#### Manual Verification
+
+If AppID was not enabled, you can verify the correct deployment via the [client webapp](https://www.todobackend.com/client/index.html) or via the [tests](https://www.todobackend.com/specs/index.html) and pasting in the URL of the API `https://<endpoint>/gws/apigateway/api/<id>/v1/todo`.
+
+If AppID is enabled, you can follow this step-by-step explanation of what the automated verification script does. You will need to provision a user, obtain a token and use cURL to use your API.
+
+The verification is based on the flow that a [backend app](https://console.bluemix.net/docs/services/appid/backend-apps.html#adding-backend) would use to interact with the protected REST api.
+The flow would different for a [webapp](https://console.bluemix.net/docs/services/appid/web-apps.html#adding-web) or a [mobile app](https://console.bluemix.net/docs/services/appid/mobile-apps.html#adding-mobile).
+
+The first step is to setup a few environment variables. The values for these are in the service credentials provisioned earlier on the AppID service:
+
+```
+APPID_TENANTID
+APPID_CLIENTID
+APPID_OAUTHURL
+APPID_MGMTURL
+APPID_SECRET
+```
+
+You'll need an IBM cloud token as well:
+
+```bash
+IBMCLOUD_BEARER_TOKEN=$(ibmcloud iam oauth-tokens | awk '/IAM/{ print $3" "$4 }')
+```
+
+#### Provision a demo user
+
+For the demo with provision a user in [AppID](https://www.ibm.com/cloud/app-id) [cloud directory](https://console.bluemix.net/docs/services/appid/cloud-directory.html#cd). Cloud directory exposes a management API which allows us to add a new user using the IBM Cloud Bearer token alone. The management API URL is specific to the instance of AppID provisioned as part of this pattern.
+
+```bash
+DEMO_EMAIL=user@demo.email
+DEMO_PASSWORD=verysecret
+curl -s -X POST \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  --header "Authorization: $IBMCLOUD_BEARER_TOKEN" \
+  -d '{"emails": [
+          {"value": "'$DEMO_EMAIL'","primary": true}
+        ],
+       "userName": "'$DEMO_EMAIL'",
+       "password": "'$DEMO_PASSWORD'"
+      }' \
+  "${APPID_MGMTURL}/cloud_directory/Users" | jq .
+```
+
+Expected result:
+
+```
+{
+  "emails": [
+    {
+      "value": "user@demo.email",
+      "primary": true
+    }
+  ],
+  "displayName": "user@demo.email",
+  "meta": {
+    "created": "2018-11-19T15:27:10.471Z",
+    "location": "/v1/6fbece0f-dd16-4e69-afb9-b431cb594c18/Users/86d06a5e-f37a-4dee-ae95-066cd6e6126e",
+    "lastModified": "2018-11-19T15:27:10.471Z",
+    "resourceType": "User"
+  },
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User"
+  ],
+  "id": "86d06a5e-f37a-4dee-ae95-066cd6e6126e",
+  "userName": "user@demo.email"
+}
+```
+
+#### Obtain a token
+
+The next step is to obtain a token for the user we just provisioned in the cloud directory.
+
+```
+DEMO_BEARER_TOKEN=$(curl -s -X POST -u $APPID_CLIENTID:$APPID_SECRET \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --header 'Accept: application/json' \
+  -d 'grant_type=password&username='$DEMO_EMAIL'&password='$DEMO_PASSWORD \
+  "${APPID_OAUTHURL}/token" | jq -r .id_token)
+```
+
+#### Use the API
+
+Create a TODO (http POST):
+
+```
+curl -s -X POST --header "Authorization: Bearer $DEMO_BEARER_TOKEN" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  -d '{"title": "Run the demo"}' \
+  "$POST_URL" | jq .
+```
+
+List all TODOs (http GET):
+
+```
+curl -s -X GET --header "Authorization: Bearer $DEMO_BEARER_TOKEN" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  "${GET_URL}/" | jq .
+```
+
+Delete a TODO (http DELETE):
+
+```
+TODO_URL=<url of a todo from the create / list calls>
+curl -s -X DELETE --header "Authorization: Bearer $DEMO_BEARER_TOKEN" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  "${TODO_URL}/" | jq .
 ```
 
 ### Undeployment
