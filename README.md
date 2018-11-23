@@ -49,8 +49,8 @@ and persisted across sessions.
 
 You will need a few tools installed to deploy the pattern yourself:
 * `git`
+* `cURL`
 * `ibmcloud` ([installation instructions](https://console.bluemix.net/docs/cli/reference/ibmcloud/download_cli.html#install_use)).
-* [jq](https://stedolan.github.io/jq/download/): required for the post install demo
 * [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy#downloading-released-binaries): required to deploy actions and APIs to IBM Cloud Functions
 * [terraform](https://www.terraform.io/downloads.html) and [terraform IBM cloud](https://github.com/IBM-Cloud/terraform-provider-ibm/releases): required when installing using the [provided deploy script](#deploy-through-the-deployment-script)
 
@@ -221,7 +221,7 @@ Delete all TODOs
 {}
 ```
 
-#### Manual Verification
+### Manual Verification
 
 If AppID was not enabled, you can verify the correct deployment via the [client webapp](https://www.todobackend.com/client/index.html) or via the [tests](https://www.todobackend.com/specs/index.html) and pasting in the URL of the API `https://<endpoint>/gws/apigateway/api/<id>/v1/todo`.
 

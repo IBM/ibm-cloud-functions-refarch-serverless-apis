@@ -45,12 +45,30 @@ function _err() {
 
 function check_tools() {
     MISSING_TOOLS=""
+    git --version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} git"
+    curl --version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} curl"
     ibmcloud --version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} ibmcloud"
     terraform version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} terraform"
     wskdeploy version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} wskdeploy"
     if [[ -n "$MISSING_TOOLS" ]]; then
       _err "Some tools (${MISSING_TOOLS# }) could not be found, please install them first and then run deploy.sh"
       exit 1
+    fi
+    # JQ or replacements
+    JSON_PRETTY="cat"
+    JSON_TOKEN='sed -n s/^.*"id_token":"\([^"]*\)".*$/\1/p'
+    JSON_URL='awk -F" /url/{ print $4 }'
+    JSON_TOOL=""
+    echo "" | jqq . &> /dev/null && JSON_TOOL=jq
+    if [[ "$JSON_TOOL" == "jq" ]]; then
+      JSON_PRETTY="jq ."
+      JSON_TOKEN="jq -r .id_token"
+      JSON_URL="jq -r .[].url"
+    else
+      python -V &> /dev/null && JSON_TOOL=python
+      if [[ "$JSON_TOOL" == "python" ]]; then
+        JSON_PRETTY="python -mjson.tool"
+      fi
     fi
 }
 
@@ -199,14 +217,14 @@ if [[ "$API_USE_APPID" == "true" ]]; then
          "userName": "'$DEMO_EMAIL'",
          "password": "'$DEMO_PASSWORD'"
         }' \
-    "${APPID_MGMTURL}/cloud_directory/Users" | jq .
+    "${APPID_MGMTURL}/cloud_directory/Users" | $JSON_PRETTY
   # Get a token for the demo user
   _out Get a token from the demo user
   DEMO_BEARER_TOKEN=$(curl -s -X POST -u $APPID_CLIENTID:$APPID_SECRET \
     --header 'Content-Type: application/x-www-form-urlencoded' \
     --header 'Accept: application/json' \
     -d 'grant_type=password&username='$DEMO_EMAIL'&password='$DEMO_PASSWORD \
-    "${APPID_OAUTHURL}/token" | jq -r .id_token)
+    "${APPID_OAUTHURL}/token" | $JSON_TOKEN)
   export APPID_TENANTID APPID_CLIENTID APPID_OAUTHURL APPID_SECRET APPID_MGMTURL \
     DEMO_EMAIL DEMO_PASSWORD DEMO_BEARER_TOKEN
   env | egrep '(APPID|DEMO)_'
@@ -227,19 +245,19 @@ curl -s -X POST $AUTH_HEADER_1 "$AUTH_HEADER_2" \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
   -d '{"title": "Run the demo"}' \
-  "$POST_URL" | jq . >&3
+  "$POST_URL" | $JSON_PRETTY >&3
 _out "Post a TODO"
 curl -s -X POST $AUTH_HEADER_1 "$AUTH_HEADER_2" \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
   -d '{"title": "Like this pattern"}' \
-  "$POST_URL" | jq . >&3
+  "$POST_URL" | $JSON_PRETTY >&3
 # And fetch them
 _out "List all TODOs"
 curl -s -X GET $AUTH_HEADER_1 "$AUTH_HEADER_2" \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
-  "${GET_URL}/" | jq . >&3
+  "${GET_URL}/" | $JSON_PRETTY >&3
 # Cleanup
 _out "Delete all TODOs"
 for todo_url in $(curl -s -X GET $AUTH_HEADER_1 "$AUTH_HEADER_2" \
@@ -249,7 +267,7 @@ for todo_url in $(curl -s -X GET $AUTH_HEADER_1 "$AUTH_HEADER_2" \
   curl -s -X DELETE $AUTH_HEADER_1 "$AUTH_HEADER_2" \
     --header 'Content-Type: application/json' \
     --header 'Accept: application/json' \
-    "${todo_url}" | jq . >&3
+    "${todo_url}" | $JSON_PRETTY >&3
 done
 ;;
 * )
