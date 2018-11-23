@@ -43,6 +43,17 @@ function _err() {
   echo "$(date +'%F %H:%M:%S') $@"
 }
 
+function check_tools() {
+    MISSING_TOOLS=""
+    ibmcloud --version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} ibmcloud"
+    terraform version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} terraform"
+    wskdeploy version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} wskdeploy"
+    if [[ -n "$MISSING_TOOLS" ]]; then
+      _err "Some tools (${MISSING_TOOLS# }) could not be found, please install them first and then run deploy.sh"
+      exit 1
+    fi
+}
+
 function ibmcloud_login() {
   # Skip version check updates
   ibmcloud config --check-version=false
@@ -121,6 +132,8 @@ function uninstall() {
 }
 
 # Main script starts here
+check_tools
+
 # Load configuration variables
 if [ ! -f local.env ]; then
   _err "Before deploying, copy template.local.env into local.env and fill in environment specific values."
@@ -138,7 +151,9 @@ export IBMCLOUD_API_KEY BLUEMIX_REGION
 export TF_VAR_appid_plan=${IBMCLOUD_APPID_PLAN:-"lite"}
 export TF_VAR_cloudant_plan=${IBMCLOUD_CLOUDANT_PLAN:-"Lite"}
 
-case "$1" in
+WHAT_TO_DO=${1:-"usage"}
+
+case "$WHAT_TO_DO" in
 "--install" )
 shift
 _out Full install output in $LOG_FILE
