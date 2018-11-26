@@ -26,27 +26,16 @@ root_folder=$(cd $(dirname $0); pwd)
 nodejs_folder=${root_folder}/runtimes/nodejs
 actions_folder=${nodejs_folder}/actions
 
-# SETUP logging (redirect stdout and stderr to a log file)
-readonly LOG_FILE="${root_folder}/deploy.log"
-touch $LOG_FILE
-exec 3>&1 # Save stdout
-exec 4>&2 # Save stderr
-exec 1>$LOG_FILE 2>&1
-
 function _out() {
-  echo "$@" >&3
   echo "$(date +'%F %H:%M:%S') $@"
 }
 
 function _err() {
-  echo "$@" >&4
   echo "$(date +'%F %H:%M:%S') $@"
 }
 
 function check_tools() {
     MISSING_TOOLS=""
-    git --version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} git"
-    curl --version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} curl"
     ibmcloud --version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} ibmcloud"
     terraform version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} terraform"
     wskdeploy version &> /dev/null || MISSING_TOOLS="${MISSING_TOOLS} wskdeploy"
@@ -134,7 +123,7 @@ function install() {
     rm ${root_folder}/appid/_api_definition.json
   fi
   _out All done.
-  ibmcloud fn api list todos >&3
+  ibmcloud fn api list todos
 }
 
 function uninstall() {
@@ -153,15 +142,19 @@ function uninstall() {
 check_tools
 
 # Load configuration variables
-if [ ! -f local.env ]; then
-  _err "Before deploying, copy template.local.env into local.env and fill in environment specific values."
-  exit 1
+LOAD_ENV_FILE=${LOAD_ENV_FILE:-true}
+
+if [[ "$LOAD_ENV_FILE" == "true" ]]; then
+  if [ ! -f local.env ]; then
+    _err "Before deploying, copy template.local.env into local.env and fill in environment specific values."
+    exit 1
+  fi
+
+  source local.env
 fi
-source local.env
+
 PROVISION_INFRASTRUCTURE=${PROVISION_INFRASTRUCTURE:-true}
 API_USE_APPID=${API_USE_APPID:-false}
-export TF_VAR_ibm_sl_username=$SL_USERNAME
-export TF_VAR_ibm_sl_api_key=$SL_API_KEY
 export TF_VAR_ibm_bx_api_key=$IBMCLOUD_API_KEY
 export TF_VAR_ibm_cf_org=$IBMCLOUD_ORG
 export TF_VAR_ibm_cf_space=$IBMCLOUD_SPACE
@@ -174,13 +167,11 @@ WHAT_TO_DO=${1:-"usage"}
 case "$WHAT_TO_DO" in
 "--install" )
 shift
-_out Full install output in $LOG_FILE
 ibmcloud_login
 install $@
 ;;
 "--uninstall" )
 shift
-_out Full uninstall output in $LOG_FILE
 ibmcloud_login
 uninstall $@
 ;;

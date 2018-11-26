@@ -1,6 +1,4 @@
 variable ibm_bx_api_key {}
-variable ibm_sl_username {}
-variable ibm_sl_api_key {}
 variable ibm_cf_org {}
 variable ibm_cf_space {}
 variable resource_prefix {
