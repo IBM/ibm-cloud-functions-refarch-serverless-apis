@@ -112,7 +112,7 @@ function install() {
   # configured in ~/.wskprops by default. It can be overwritten by passing
   # wskdeploy params to the deploy script
   _out Provisioning Functions and APIs
-  wskdeploy -p ${nodejs_folder}/ $@
+  wskdeploy -p ${nodejs_folder}/ --config $HOME/.wskprops $@
   # If AppID is enabled update the API definition to include the AppID tenant
   if [ "$API_USE_APPID" == "true" ]; then
     echo "Add the AppID tenant $API_APPID_TENANTID to the swagger API definition"
