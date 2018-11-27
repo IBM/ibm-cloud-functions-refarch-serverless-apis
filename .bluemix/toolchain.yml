@@ -38,5 +38,10 @@ services:
         execute: true
 form:
   pipeline:
+    parameters:
+      api-key: ""
+      prod-space: ""
+      prod-organization: ""
+      prod-region: ""
     schema:
       $ref: deploy.json

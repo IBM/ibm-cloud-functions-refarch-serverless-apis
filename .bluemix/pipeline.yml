@@ -1,6 +1,6 @@
 ---
 stages:
-- name: DEPLOY
+  - name: DEPLOY
   inputs:
   - type: git
     branch: master
