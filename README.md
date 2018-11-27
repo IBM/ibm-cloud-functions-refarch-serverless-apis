@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api.svg?branch=master)](https://travis.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api)
 
+[![Deploy to IBM Cloud](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/jthomas/ibm-cloud-functions-rest-api)
+
 This reference architecture shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from a REST API. No code runs until an API call to an endpoint associated to a function is received by the API GW. When that happens, application instances are started to match the load needed by each API request exactly.
 
 In addition to using cloud resources efficiently, this means that developers can build and deploy applications more quickly. You can learn more about the benefits of building a serverless architecture for this use case in the accompanying [IBM Code Pattern](https://developer.ibm.com/code/technologies/serverless/).
