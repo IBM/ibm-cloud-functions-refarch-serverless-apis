@@ -1,0 +1,42 @@
+version: '2'
+template:
+  name: "IBM Cloud Functions REST API Toolchain"
+  description: "Deploy serverless REST API demo application to IBM Cloud Functions"
+  required:
+    - sample-build
+    - sample-repo
+  info:
+    git url: >-
+      [https://github.com/jthomas/ibm-cloud-functions-rest-api](https://github.com/jthomas/ibm-cloud-functions-rest-api)
+    git branch: >-
+      [master](https://github.com/jthomas/ibm-cloud-functions-rest-api/tree/master)
+toolchain:
+  name: 'cloud-functions-rest-api-toolchain'
+services:
+  sample-repo:
+    service_id: githubpublic
+    parameters:
+      repo_name: 'ibm-cloud-functions-rest-api'
+      repo_url: 'https://github.com/jthomas/ibm-cloud-functions-rest-api'
+      type: clone
+  sample-build:
+    service_id: pipeline
+    parameters:
+      services:
+        - sample-repo
+      name: '{{services.sample-repo.parameters.repo_name}}'
+      ui-pipeline: true
+      configuration:
+        content:
+          $text: pipeline.yml
+        env:
+          SAMPLE_REPO: sample-repo
+          IBMCLOUD_API_KEY: '{{form.pipeline.parameters.api-key}}'
+          IBMCLOUD_SPACE: '{{form.pipeline.parameters.prod-space}}'
+          IBMCLOUD_ORG: '{{form.pipeline.parameters.prod-organization}}'
+          BLUEMIX_REGION: '{{form.pipeline.parameters.prod-region}}'
+        execute: true
+form:
+  pipeline:
+    schema:
+      $ref: deploy.json

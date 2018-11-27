@@ -1,0 +1,28 @@
+---
+stages:
+- name: DEPLOY
+  inputs:
+  - type: git
+    branch: master
+    service: ${SAMPLE_REPO}
+  properties:
+  - name: LOAD_ENV_FILE
+    value: 'false'
+    type: text
+  - name: API_USE_APPID
+    value: 'false'
+    type: text
+  jobs:
+  - name: Deploy
+    type: deployer
+    deploy_type: customimage
+    script: |-
+      #!/bin/bash
+
+      ./deploy.sh --install
+    docker_image: jamesthomas/cloud-functions-tools
+hooks:
+- enabled: true
+  label: null
+  ssl_enabled: false
+  url: http://lms-api/v1/messaging/webhook/publish

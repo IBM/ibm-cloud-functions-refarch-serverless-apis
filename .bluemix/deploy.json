@@ -1,0 +1,79 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Sample Deploy Stage",
+    "description": "sample toolchain",
+    "longDescription": "The Delivery Pipeline automates continuous deployment.",
+    "type": "object",
+    "properties": {
+      "prod-region": {
+        "description": "IBM Cloud Region",
+        "type": "string"
+      },
+      "prod-organization": {
+        "description": "IBM Cloud Organisation",
+        "type": "string"
+      },
+      "prod-space": {
+        "description": "IBM Cloud Space",
+        "type": "string"
+      },
+      "api-key": {
+        "description": "IBM Cloud API key",
+        "type": "string"
+      }
+    },
+    "required": [
+        "prod-region",
+        "prod-organization",
+        "prod-space",
+        "api-key"
+    ],
+    "form": [
+        {
+            "type": "validator",
+            "url": "/devops/setup/bm-helper/helper.html"
+        },
+        {
+	        "type": "password",
+	        "readonly": false,
+	        "title": "IBM Cloud API Key",
+	        "key": "api-key"
+        },
+        {
+            "type": "table",
+            "columnCount": 3,
+            "widths": [
+                "33%",
+                "33%",
+                "33%"
+            ],
+            "items": [
+                {
+                    "type": "label",
+                    "title": "Region"
+                },
+                {
+                    "type": "label",
+                    "title": "Organisation"
+                },
+                {
+                    "type": "label",
+                    "title": "Space"
+                },
+                {
+                    "type": "select",
+                    "key": "prod-region"
+                },
+                {
+                    "type": "select",
+                    "key": "prod-organization"
+                },
+                {
+                    "type": "select",
+                    "key": "prod-space",
+                    "readonly": false
+                }
+            ]
+        }
+    ]
+}
