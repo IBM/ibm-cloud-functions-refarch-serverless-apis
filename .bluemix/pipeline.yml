@@ -6,18 +6,6 @@ stages:
     branch: master
     service: ${SAMPLE_REPO}
   properties:
-  - name: IBMCLOUD_API_KEY
-    value: ${IBMCLOUD_API_KEY}
-    type: text
-  - name: IBMCLOUD_SPACE
-    value: ${IBMCLOUD_SPACE}
-    type: text
-  - name: IBMCLOUD_ORG
-    value: ${IBMCLOUD_ORG}
-    type: text
-  - name: BLUEMIX_REGION
-    value: ${BLUEMIX_REGION}
-    type: text
   - name: LOAD_ENV_FILE
     value: 'false'
     type: text
@@ -38,3 +26,16 @@ hooks:
   label: null
   ssl_enabled: false
   url: http://lms-api/v1/messaging/webhook/publish
+properties:
+- name: IBMCLOUD_API_KEY
+  value: ${IBMCLOUD_API_KEY}
+  type: text
+- name: IBMCLOUD_SPACE
+  value: ${IBMCLOUD_SPACE}
+  type: text
+- name: IBMCLOUD_ORG
+  value: ${IBMCLOUD_ORG}
+  type: text
+- name: BLUEMIX_REGION
+  value: ${BLUEMIX_REGION}
+  type: text
