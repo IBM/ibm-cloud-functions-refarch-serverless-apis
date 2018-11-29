@@ -62,14 +62,15 @@ function check_tools() {
 }
 
 function ibmcloud_login() {
+  # remove 'ibm:yp:' prefix from region identifier if present. 
+  IBMCLOUD_REGION=$(echo $IBMCLOUD_REGION | cut -f 3 -d :)
   # Skip version check updates
   ibmcloud config --check-version=false
 
-  # Obtain the API endpoint from BLUEMIX_REGION and set it as default
+  # Obtain the API endpoint from IBMCLOUD_REGION and set it as default
   _out Logging in to IBM cloud
   ibmcloud api --unset
-  IBMCLOUD_API_ENDPOINT=$(ibmcloud api | awk '/'$BLUEMIX_REGION'/{ print $2 }')
-  ibmcloud api $IBMCLOUD_API_ENDPOINT
+  IBMCLOUD_API_ENDPOINT=$(ibmcloud api | awk '/'$IBMCLOUD_REGION'/{ print $2 }')
 
   # Login to ibmcloud, generate .wskprops
   ibmcloud login --apikey $IBMCLOUD_API_KEY -a $IBMCLOUD_API_ENDPOINT
@@ -86,7 +87,7 @@ function usage() {
 
 function install() {
   # Provision infrastructure
-  # If disabled, CLOUDANT_USERNAME, CLOUDANT_USERNAME and API_APPID_TENANTID
+  # If disabled, CLOUDANT_USERNAME, CLOUDANT_PASSWORD and API_APPID_TENANTID
   # must be provided in local.env
   # Terraform and the terraform IBM Cloud Provider must be installed
   # TF_VAR_ibm_bx_api_key, TF_VAR_ibm_bx_api_key and TF_VAR_ibm_sl_api_key
@@ -158,7 +159,7 @@ API_USE_APPID=${API_USE_APPID:-false}
 export TF_VAR_ibm_bx_api_key=$IBMCLOUD_API_KEY
 export TF_VAR_ibm_cf_org=$IBMCLOUD_ORG
 export TF_VAR_ibm_cf_space=$IBMCLOUD_SPACE
-export IBMCLOUD_API_KEY BLUEMIX_REGION
+export IBMCLOUD_API_KEY IBMCLOUD_REGION
 export TF_VAR_appid_plan=${IBMCLOUD_APPID_PLAN:-"lite"}
 export TF_VAR_cloudant_plan=${IBMCLOUD_CLOUDANT_PLAN:-"Lite"}
 

@@ -117,7 +117,7 @@ cat serverless_api.apikey
 ```
 
 You are now ready to setup your `local.env` file. Make a copy of the `template.local.env` which is in the root directory of the git repo you cloned.
-Edit `local.env` and set `IBMCLOUD_API_KEY`, `IBMCLOUD_ORG`, `IBMCLOUD_SPACE` and `BLUEMIX_REGION` to match the apikey in `serverless_api.apikey` and the org, space and region name that you're using.
+Edit `local.env` and set `IBMCLOUD_API_KEY`, `IBMCLOUD_ORG`, `IBMCLOUD_SPACE` and `IBM_CLOUD_REGION` to match the apikey in `serverless_api.apikey` and the org, space and region name that you're using.
 
 ```
 # Prepare a local.env
@@ -128,7 +128,7 @@ cp template.local.env local.env
 IBMCLOUD_API_KEY=xxxx_myawsomeapikey_yyyy
 IBMCLOUD_ORG=ORG_NAME
 IBMCLOUD_SPACE=ORG_SPACE
-BLUEMIX_REGION=REGION
+IBM_CLOUD_REGION=REGION
 ```
 
 ### Additional infrastructure

@@ -12,6 +12,10 @@ stages:
   - name: API_USE_APPID
     value: 'false'
     type: text
+  - name: PROVISION_INFRASTRUCTURE
+    value: 'false'
+    type: text
+  jobs:
   jobs:
   - name: Deploy
     type: deployer
@@ -27,6 +31,12 @@ hooks:
   ssl_enabled: false
   url: http://lms-api/v1/messaging/webhook/publish
 properties:
+- name: CLOUDANT_USERNAME
+  value: ${CLOUDANT_USERNAME}
+  type: text
+- name: CLOUDANT_PASSWORD
+  value: ${CLOUDANT_PASSWORD}
+  type: text
 - name: IBMCLOUD_API_KEY
   value: ${IBMCLOUD_API_KEY}
   type: text
@@ -36,6 +46,6 @@ properties:
 - name: IBMCLOUD_ORG
   value: ${IBMCLOUD_ORG}
   type: text
-- name: BLUEMIX_REGION
-  value: ${BLUEMIX_REGION}
+- name: IBMCLOUD_REGION
+  value: ${IBMCLOUD_REGION}
   type: text

@@ -5,6 +5,14 @@
     "longDescription": "The Delivery Pipeline automates continuous deployment.",
     "type": "object",
     "properties": {
+      "cloudant-username": {
+        "description": "Cloudant Username",
+        "type": "string"
+      },
+      "cloudant-password": {
+        "description": "Cloudant Password",
+        "type": "string"
+      },
       "prod-region": {
         "description": "IBM Cloud Region",
         "type": "string"
@@ -23,6 +31,8 @@
       }
     },
     "required": [
+        "cloudant-username",
+        "cloudant-password",
         "prod-region",
         "prod-organization",
         "prod-space",
@@ -38,6 +48,18 @@
 	        "readonly": false,
 	        "title": "IBM Cloud API Key",
 	        "key": "api-key"
+        },
+        {
+	        "type": "text",
+	        "readonly": false,
+	        "title": "Cloudant Username",
+	        "key": "cloudant-username"
+        },
+        {
+	        "type": "password",
+	        "readonly": false,
+	        "title": "Cloudant Password",
+	        "key": "cloudant-password"
         },
         {
             "type": "table",
