@@ -1,5 +1,15 @@
 .DS_Store
-.vscode
 local.env
-*.zip
-node_modules
+
+# NodeJS specific
+node_modules/
+
+# AppID
+appid/_api_definition.json
+
+# Terraform
+infra/.terraform*
+infra/terraform.tfstate*
+
+# Logs
+*.log

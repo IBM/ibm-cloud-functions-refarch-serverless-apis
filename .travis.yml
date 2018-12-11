@@ -13,7 +13,7 @@
 # limitations under the License.
 ##############################################################################
 language: bash
-sudo: required
+sudo: true
 
 script:
-  - ./travis/build.sh
+  - ./travis/test.sh
