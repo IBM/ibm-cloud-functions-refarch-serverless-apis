@@ -58,7 +58,7 @@ Download the code using git:
 
 ```
 git clone https://github.com/IBM/ibm-cloud-functions-refarch-serverless-apis
-cd ibm-cloud-functions-rest-api
+cd ibm-cloud-functions-refarch-serverless-apis
 ```
 
 ### Deployment Alternatives
