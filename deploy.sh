@@ -143,7 +143,6 @@ function uninstall() {
 check_tools
 
 # Load configuration variables
-<<<<<<< HEAD
 LOAD_ENV_FILE=${LOAD_ENV_FILE:-true}
 
 if [[ "$LOAD_ENV_FILE" == "true" ]]; then
