@@ -1,8 +1,8 @@
 # Serverless REST API with IBM Cloud Functions (powered by Apache OpenWhisk)
 
-[![Build Status](https://travis.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api.svg?branch=master)](https://travis.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api)
+[![Build Status](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-serverless-apis.svg?branch=master)](https://travis-ci.org/IBM/ibm-cloud-functions-refarch-serverless-apis)
 
-[![Deploy to IBM Cloud](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/jthomas/ibm-cloud-functions-rest-api)
+[![Deploy to IBM Cloud](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/IBM/ibm-cloud-functions-refarch-serverless-apis)
 
 This reference architecture shows how serverless, event-driven architectures can execute code that scales automatically in response to demand from a REST API. No code runs until an API call to an endpoint associated to a function is received by the API GW. When that happens, application instances are started to match the load needed by each API request exactly.
 
@@ -59,8 +59,8 @@ You will need a few tools installed to deploy the pattern yourself:
 Download the code using git:
 
 ```
-git clone https://github.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api
-cd ibm-cloud-functions-rest-api
+git clone https://github.com/IBM/ibm-cloud-functions-refarch-serverless-apis
+cd ibm-cloud-functions-refarch-serverless-apis
 ```
 
 ### Deployment Alternatives
@@ -117,6 +117,7 @@ cat serverless_api.apikey
 ```
 
 You are now ready to setup your `local.env` file. Make a copy of the `template.local.env` which is in the root directory of the git repo you cloned.
+
 Edit `local.env` and set `IBMCLOUD_API_KEY`, `IBMCLOUD_ORG`, `IBMCLOUD_SPACE` and `IBM_CLOUD_REGION` to match the apikey in `serverless_api.apikey` and the org, space and region name that you're using.
 
 ```
@@ -165,7 +166,7 @@ To use the deployment script change directory to the root of the cloned git repo
 The deployment script outputs the highlights of the deployment process on the console. More details are available in the `deploy.log` log file. A correct output will look like:
 
 ```
-Full install output in /git/github.ibm.com/Andrea-Frittoli/ibm-cloud-functions-rest-api/deploy.log
+Full install output in /git/github.com/IBM/ibm-cloud-functions-refarch-serverless-apis/deploy.log
 Logging in to IBM cloud
 Provisioning Terraform managed infrastructure
 Provisioning Functions and APIs
