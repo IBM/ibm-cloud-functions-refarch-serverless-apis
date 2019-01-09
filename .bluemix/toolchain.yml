@@ -1,23 +1,23 @@
 version: '2'
 template:
-  name: "IBM Cloud Functions REST API Toolchain"
-  description: "Deploy serverless REST API demo application to IBM Cloud Functions"
+  name: "IBM Cloud Functions REST APIs Toolchain"
+  description: "Deploy serverless REST APIs demo application to IBM Cloud Functions"
   required:
     - sample-build
     - sample-repo
   info:
     git url: >-
-      [https://github.com/jthomas/ibm-cloud-functions-rest-api](https://github.com/jthomas/ibm-cloud-functions-rest-api)
+      [https://github.com/IBM/ibm-cloud-functions-refarch-serverless-apis](https://github.com/IBM/ibm-cloud-functions-refarch-serverless-apis)
     git branch: >-
-      [master](https://github.com/jthomas/ibm-cloud-functions-rest-api/tree/master)
+      [master](https://github.com/IBM/ibm-cloud-functions-refarch-serverless-apis/tree/master)
 toolchain:
-  name: 'cloud-functions-rest-api-toolchain'
+  name: 'cloud-functions-serverless-apis-toolchain'
 services:
   sample-repo:
     service_id: githubpublic
     parameters:
-      repo_name: 'ibm-cloud-functions-rest-api'
-      repo_url: 'https://github.com/jthomas/ibm-cloud-functions-rest-api'
+      repo_name: 'ibm-cloud-functions-refarch-serverless-apis'
+      repo_url: 'https://github.com/IBM/ibm-cloud-functions-refarch-serverless-apis'
       type: clone
   sample-build:
     service_id: pipeline
