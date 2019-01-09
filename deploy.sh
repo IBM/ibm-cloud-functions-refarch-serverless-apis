@@ -143,7 +143,6 @@ function uninstall() {
 check_tools
 
 # Load configuration variables
-<<<<<<< HEAD
 LOAD_ENV_FILE=${LOAD_ENV_FILE:-true}
 
 if [[ "$LOAD_ENV_FILE" == "true" ]]; then
@@ -160,9 +159,10 @@ API_USE_APPID=${API_USE_APPID:-false}
 export TF_VAR_ibm_bx_api_key=$IBMCLOUD_API_KEY
 export TF_VAR_ibm_cf_org=$IBMCLOUD_ORG
 export TF_VAR_ibm_cf_space=$IBMCLOUD_SPACE
+export TF_VAR_ibm_region=$IBMCLOUD_REGION
 export IBMCLOUD_API_KEY IBMCLOUD_REGION
 export TF_VAR_appid_plan=${IBMCLOUD_APPID_PLAN:-"lite"}
-export TF_VAR_cloudant_plan=${IBMCLOUD_CLOUDANT_PLAN:-"Lite"}
+export TF_VAR_cloudant_plan=${IBMCLOUD_CLOUDANT_PLAN:-"lite"}
 
 WHAT_TO_DO=${1:-"usage"}
 

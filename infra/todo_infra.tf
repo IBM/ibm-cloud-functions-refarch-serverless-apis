@@ -1,6 +1,8 @@
 variable ibm_bx_api_key {}
 variable ibm_cf_org {}
 variable ibm_cf_space {}
+variable ibm_region {}
+
 variable resource_prefix {
   type    = "string"
   default = "ow_rest_api"
@@ -11,9 +13,10 @@ variable appid_plan {
   type    = "string"
   default = "lite"
 }
+
 variable cloudant_plan {
   type    = "string"
-  default = "Lite"
+  default = "lite"
 }
 
 data "ibm_space" "spacedata" {
@@ -38,16 +41,17 @@ resource "ibm_service_key" "appid_service_key" {
   service_instance_guid = "${ibm_service_instance.appid.id}"
 }
 
-resource "ibm_service_instance" "cloudant" {
-  name       = "${var.resource_prefix}_cloudant"
-  space_guid = "${data.ibm_space.spacedata.id}"
-  service    = "cloudantNoSQLDB"
-  plan       = "${var.cloudant_plan}"
+resource "ibm_resource_instance" "cloudant" {
+  name              = "cloudant-serverless-apis-${var.ibm_region}"
+  service           = "cloudantnosqldb"
+  plan              = "${var.cloudant_plan}"
+  location          = "${var.ibm_region}"
 }
 
-resource "ibm_service_key" "cloudant_service_key" {
-  name                  = "${var.resource_prefix}_todo_key"
-  service_instance_guid = "${ibm_service_instance.cloudant.id}"
+resource "ibm_resource_key" "cloudant_service_key" {
+  name                  = "serverless-apis-cloudant-${var.ibm_region}-key"
+  role                  = "Manager"
+  resource_instance_id  = "${ibm_resource_instance.cloudant.id}"
 }
 
 output "appid_credentials" {
@@ -55,5 +59,5 @@ output "appid_credentials" {
 }
 
 output "cloudant_credentials" {
-  value = "${ibm_service_key.cloudant_service_key.credentials}"
+  value = "${ibm_resource_key.cloudant_service_key.credentials}"
 }
